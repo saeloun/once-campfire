@@ -48,7 +48,7 @@ class GoogleSessionsController < ApplicationController
 
     apply_verified_access(user, email)
     start_new_session_for user
-    redirect_to root_url
+    redirect_to post_authenticating_url
   rescue ActiveRecord::RecordNotUnique
     reject_login
   end

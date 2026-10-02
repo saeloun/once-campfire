@@ -89,6 +89,16 @@ class GoogleSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_requested redemption, times: 1
   end
 
+  test "Google login returns to the requested private dashboard" do
+    get runtime_url
+    assert_redirected_to new_session_url
+    state = begin_login
+    redeem_identity(state)
+    callback(state)
+
+    assert_redirected_to runtime_url
+  end
+
   test "wrong missing and unsigned state never reaches redemption" do
     state = begin_login
     redemption = redeem_identity(state)
