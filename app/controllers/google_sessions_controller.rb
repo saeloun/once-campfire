@@ -35,7 +35,7 @@ class GoogleSessionsController < ApplicationController
     email = identity["email"].strip.downcase
     return reject_login unless email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/) && email.length <= 255
 
-    user = User.find_by("lower(email_address) = ?", email)
+    user = User.where("lower(email_address) = ?", email).first
     if user
       return reject_login unless user.active? && !user.bot?
     else
