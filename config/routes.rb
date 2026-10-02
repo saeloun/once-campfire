@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
+  get "runtime", to: "runtime#show"
+  get "runtime/stats", to: "runtime#stats"
   root "welcome#show"
+
+  post "session/google", to: "google_sessions#create", as: :google_session
+  get "session/google/callback", to: "google_sessions#show", as: :google_session_callback
 
   resource :first_run
 

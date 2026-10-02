@@ -72,3 +72,7 @@
 <% end %>
 
 <%= render "accounts/help_contact" %>
+
+<% if ENV["GOOGLE_LOGIN_ENABLED"] == "true" %>
+  <%= button_to "Join with Google", google_session_path, params: { join_code: params[:join_code] }, class: "btn btn--reversed center txt-large", form: { data: { turbo: false } } %>
+<% end %>
