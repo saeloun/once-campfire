@@ -4,12 +4,13 @@
 <% end %>
 <% content_for :head do %>
 <style>
-  .runtime { --rt-accent: #d65329; --rt-muted: #766e68; --rt-line: #e3ded8; --rt-panel: #fffdf9; width: min(1200px, 100%); margin: 0 auto; padding: 32px 24px 64px; color: #292621; }
+  .runtime { --rt-accent: var(--color-link); --rt-muted: var(--color-border-darker); --rt-line: var(--color-border); --rt-panel: var(--color-message-bg); width: min(1200px, 100%); margin: 0 auto; padding: 32px 24px 64px; color: var(--color-text); }
   .runtime * { box-sizing: border-box; }
   .runtime header { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-bottom: 30px; }
   .runtime h1 { font-size: clamp(26px, 4vw, 42px); line-height: 1.12; letter-spacing: -.045em; margin: 8px 0 12px; }
   .runtime h2 { font-size: 17px; margin: 0 0 16px; }
   .runtime p { margin: 0; }
+  .runtime .rt-logo { width: 64px; height: 64px; border-radius: 12px; margin-bottom: 12px; }
   .runtime .rt-eyebrow { color: var(--rt-accent); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .runtime .rt-muted, .runtime small { color: var(--rt-muted); font-size: 13px; line-height: 1.6; }
   .runtime .rt-live { border: 1px solid var(--rt-line); border-radius: 30px; padding: 8px 14px; font-size: 12px; white-space: nowrap; }
@@ -36,13 +37,13 @@
   .runtime td:nth-child(n+3), .runtime th:nth-child(n+3) { text-align: right; }
   .runtime .rt-route { font-family: monospace; white-space: nowrap; }
   .runtime .rt-error { color: #c44934; } .runtime footer { margin-top: 18px; }
-  @media (prefers-color-scheme: dark) { .runtime { --rt-accent: #ff946b; --rt-muted: #aca39b; --rt-line: #393630; --rt-panel: #201f1b; color: #f3eee5; } }
   @media (max-width: 700px) { .runtime { padding: 20px 14px 50px; } .runtime header { align-items: flex-start; } .runtime .rt-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .runtime .rt-charts, .runtime .rt-details, .runtime .rt-proof-grid { grid-template-columns: 1fr; } .runtime .rt-panel { padding: 17px; } }
 </style>
 <% end %>
 <section class="runtime" data-controller="runtime-stats" data-runtime-stats-url-value="/runtime/stats">
   <header>
-    <div><p class="rt-eyebrow">Deccan Queen on Rails / Campfire</p><h1>Native. Live. Measured.</h1><p class="rt-muted">The running Spinel application, observed from the host.</p></div>
+    <div><%= image_tag fresh_account_logo_path, alt: "Deccan Queen on Rails", size: 64, class: "rt-logo" %>
+      <p class="rt-eyebrow">Deccan Queen on Rails / Campfire</p><h1>Native. Live. Measured.</h1><p class="rt-muted">The running Spinel application, observed from the host.</p></div>
     <span class="rt-live" data-field="live" role="status">Connecting</span>
   </header>
   <div class="rt-panel rt-proof">

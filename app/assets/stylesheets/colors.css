@@ -13,23 +13,35 @@
   --lch-green: 65.59% 0.234 142.49;
   --lch-always-black: 0% 0 0;
 
-  /* Abstractions */
+  /* Deccan Queen on Rails palette, shared with the conference website. */
   --color-negative: oklch(var(--lch-red));
   --color-positive: oklch(var(--lch-green));
-  --color-bg: oklch(var(--lch-white));
-  --color-message-bg: oklch(var(--lch-gray));
-  --color-text: oklch(var(--lch-black));
-  --color-text-reversed: oklch(var(--lch-white));
-  --color-link: oklch(var(--lch-blue));
-  --color-border: oklch(var(--lch-gray));
-  --color-border-dark: oklch(var(--lch-gray-dark));
-  --color-border-darker: oklch(var(--lch-gray-darker));
-  --color-selected: oklch(var(--lch-blue-light));
-  --color-selected-dark: oklch(var(--lch-blue-dark));
-  --color-alert: oklch(var(--lch-orange));
+  --color-bg: hsl(40 30% 96%);
+  --color-message-bg: hsl(20 30% 94%);
+  --color-text: hsl(0 0% 12%);
+  --color-text-reversed: hsl(40 30% 96%);
+  --color-link: hsl(348 70% 35%);
+  --color-border: hsl(30 20% 86%);
+  --color-border-dark: hsl(30 20% 78%);
+  --color-border-darker: hsl(20 15% 45%);
+  --color-selected: hsl(20 45% 92%);
+  --color-selected-dark: hsl(348 65% 45%);
+  --color-alert: hsl(28 88% 50%);
 
   /* Redefine named color values for dark mode */
   @media (prefers-color-scheme: dark) {
+    --color-bg: hsl(20 12% 7%);
+    --color-message-bg: hsl(20 10% 13%);
+    --color-text: hsl(40 20% 90%);
+    --color-text-reversed: hsl(20 12% 7%);
+    --color-link: hsl(348 68% 58%);
+    --color-border: hsl(20 12% 18%);
+    --color-border-dark: hsl(20 12% 24%);
+    --color-border-darker: hsl(30 12% 58%);
+    --color-selected: hsl(20 15% 15%);
+    --color-selected-dark: hsl(348 62% 68%);
+    --color-alert: hsl(28 80% 58%);
+
     --lch-black: 100% 0 0;
     --lch-white: 0% 0 0;
     --lch-gray: 25.2% 0 0;
