@@ -1,0 +1,75 @@
+<% @page_title = "Native Campfire · Runtime" %>
+<% content_for :nav do %>
+  <div class="flex-item-justify-start"><%= link_back %></div>
+<% end %>
+<% content_for :head do %>
+<style>
+  .runtime { --rt-accent: #d65329; --rt-muted: #766e68; --rt-line: #e3ded8; --rt-panel: #fffdf9; width: min(1200px, 100%); margin: 0 auto; padding: 32px 24px 64px; color: #292621; }
+  .runtime * { box-sizing: border-box; }
+  .runtime header { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-bottom: 30px; }
+  .runtime h1 { font-size: clamp(26px, 4vw, 42px); line-height: 1.12; letter-spacing: -.045em; margin: 8px 0 12px; }
+  .runtime h2 { font-size: 17px; margin: 0 0 16px; }
+  .runtime p { margin: 0; }
+  .runtime .rt-eyebrow { color: var(--rt-accent); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .runtime .rt-muted, .runtime small { color: var(--rt-muted); font-size: 13px; line-height: 1.6; }
+  .runtime .rt-live { border: 1px solid var(--rt-line); border-radius: 30px; padding: 8px 14px; font-size: 12px; white-space: nowrap; }
+  .runtime .rt-live::before { content: ""; display: inline-block; height: 7px; width: 7px; border-radius: 50%; margin-right: 8px; background: var(--rt-accent); }
+  .runtime .rt-panel { border: 1px solid var(--rt-line); border-radius: 16px; background: var(--rt-panel); padding: 22px; min-width: 0; }
+  .runtime .rt-proof { border-top: 3px solid var(--rt-accent); margin-bottom: 20px; }
+  .runtime .rt-proof-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .runtime .rt-proof strong { display: block; margin: 4px 0; font-size: 15px; }
+  .runtime .rt-proof code { display: block; font-size: 11px; overflow-wrap: anywhere; color: var(--rt-muted); }
+  .runtime .rt-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .runtime .rt-value { display: block; font-size: clamp(24px, 3vw, 34px); font-weight: 650; letter-spacing: -.04em; line-height: 1.5; }
+  .runtime .rt-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 20px; }
+  .runtime .rt-chart { width: 100%; height: 150px; overflow: visible; margin-top: 12px; display: block; }
+  .runtime .rt-chart polyline { stroke: var(--rt-accent); stroke-width: 2.5; fill: none; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .runtime .rt-chart line { stroke: var(--rt-line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .runtime .rt-chart-meta { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--rt-muted); }
+  .runtime .rt-details { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .runtime dl { display: grid; grid-template-columns: 1fr auto; margin: 0; gap: 12px; font-size: 13px; }
+  .runtime dt { color: var(--rt-muted); } .runtime dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .runtime .rt-table-scroll { overflow-x: auto; }
+  .runtime table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .runtime th { color: var(--rt-muted); text-align: left; font-weight: 500; padding: 0 10px 10px 0; }
+  .runtime td { border-top: 1px solid var(--rt-line); padding: 10px 10px 10px 0; font-variant-numeric: tabular-nums; }
+  .runtime td:nth-child(n+3), .runtime th:nth-child(n+3) { text-align: right; }
+  .runtime .rt-route { font-family: monospace; white-space: nowrap; }
+  .runtime .rt-error { color: #c44934; } .runtime footer { margin-top: 18px; }
+  @media (prefers-color-scheme: dark) { .runtime { --rt-accent: #ff946b; --rt-muted: #aca39b; --rt-line: #393630; --rt-panel: #201f1b; color: #f3eee5; } }
+  @media (max-width: 700px) { .runtime { padding: 20px 14px 50px; } .runtime header { align-items: flex-start; } .runtime .rt-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .runtime .rt-charts, .runtime .rt-details, .runtime .rt-proof-grid { grid-template-columns: 1fr; } .runtime .rt-panel { padding: 17px; } }
+</style>
+<% end %>
+<section class="runtime" data-controller="runtime-stats" data-runtime-stats-url-value="/runtime/stats">
+  <header>
+    <div><p class="rt-eyebrow">Deccan Queen on Rails / Campfire</p><h1>Native. Live. Measured.</h1><p class="rt-muted">The running Spinel application, observed from the host.</p></div>
+    <span class="rt-live" data-field="live" role="status">Connecting</span>
+  </header>
+  <div class="rt-panel rt-proof">
+    <h2>Runtime evidence</h2>
+    <div class="rt-proof-grid">
+      <div><small>Executable inspection</small><strong data-field="proof">Waiting for telemetry</strong><code data-field="executable">Unavailable</code></div>
+      <div><small>Ruby runtime / process maps</small><strong data-field="ruby">Unavailable</strong><code data-field="container">Container unavailable</code></div>
+      <div><small>Deployed artifact</small><strong data-field="image">Unavailable</strong><code data-field="revision">Revision unavailable</code><code data-field="digest">Digest unavailable</code></div>
+    </div>
+  </div>
+  <div class="rt-cards">
+    <div class="rt-panel"><small>Requests observed</small><span class="rt-value" data-field="total">—</span><small data-field="observed">Collector lifetime</small></div>
+    <div class="rt-panel"><small>Throughput</small><span class="rt-value" data-field="rate">—</span><small>requests / second</small></div>
+    <div class="rt-panel"><small>p95 handler latency</small><span class="rt-value" data-field="p95">—</span><small>last 60 seconds · recorded events</small></div>
+    <div class="rt-panel"><small>Server errors</small><span class="rt-value" data-field="errors">—</span><small data-field="errorRate">HTTP 5xx</small></div>
+  </div>
+  <div class="rt-charts">
+    <% [["cpu_percent", "CPU usage", "One full core = 100%"], ["rss_bytes", "Resident memory", "Sum of process RSS"], ["rate_per_second", "Request throughput", "Completed HTTP requests / second"], ["p95_ms", "Handler latency · p95", "60-second event window"]].each do |key, title, description| %>
+      <div class="rt-panel"><h2><%= title %></h2><div class="rt-chart-meta"><span><%= description %></span><strong data-chart-value="<%= key %>">—</strong></div><svg class="rt-chart" data-chart="<%= key %>" viewBox="0 0 600 150" preserveAspectRatio="none" role="img" aria-label="<%= title %> over the retained sampling window"><line x1="0" y1="140" x2="600" y2="140"></line><g></g></svg><div class="rt-chart-meta"><span data-field="historyStart">Waiting for samples</span><span>Now</span></div></div>
+    <% end %>
+  </div>
+  <div class="rt-details">
+    <div class="rt-panel"><h2>Process &amp; storage</h2><dl>
+      <% [["uptime", "Container uptime"], ["restarts", "Container restarts"], ["workers", "Native processes / threads"], ["fds", "Open file descriptors"], ["connections", "Established TCP connections"], ["memory", "Cgroup memory / limit"], ["cpuLimit", "CPU allocation"], ["hostCPU", "Host CPU usage"], ["hostLoad", "Host load · 1 / 5 / 15 min"], ["hostMemory", "Host memory used / total"], ["database", "Database footprint"], ["records", "Users / rooms / messages"]].each do |key, title| %><dt><%= title %></dt><dd data-field="<%= key %>">—</dd><% end %>
+    </dl></div>
+    <div class="rt-panel"><h2>HTTP status breakdown</h2><div class="rt-table-scroll"><table><thead><tr><th>Status</th><th>Meaning</th><th>Requests</th><th>Share</th></tr></thead><tbody data-runtime-stats-target="statuses"><tr><td colspan="4">Waiting for request events</td></tr></tbody></table></div></div>
+  </div>
+  <div class="rt-panel"><h2>Recent requests</h2><p class="rt-muted">Newest 50 completed requests. Paths are normalized; no query strings or user content.</p><div class="rt-table-scroll" style="margin-top:18px"><table><thead><tr><th>Time</th><th>Method / route</th><th>Status</th><th>Duration</th><th>Body bytes</th></tr></thead><tbody data-runtime-stats-target="recent"><tr><td colspan="5">Waiting for request events</td></tr></tbody></table></div></div>
+  <footer class="rt-muted"><span data-field="updated" role="status">Waiting for collector</span><br>Private to signed-in members. Refreshes every 5 seconds. Charts retain up to one hour; Prometheus stores 14 days. CPU and memory are host measurements, latency measures native handler execution and excludes network/TLS time. Bytes count response bodies; WebSocket frames are excluded.</footer>
+</section>

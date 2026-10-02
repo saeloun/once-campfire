@@ -43,6 +43,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil parsed_cookies.signed[:session_token]
   end
 
+  test "HTTPS login protects the authentication cookie" do
+    https!
+    post session_url, params: { email_address: "david@37signals.com", password: "secret123456" }
+
+    assert_redirected_to root_url
+    header = response.headers["set-cookie"].to_s
+    assert_match(/session_token=.*secure/i, header)
+    assert_match(/session_token=.*httponly/i, header)
+    assert_match(/session_token=.*samesite=lax/i, header)
+  end
+
   test "destroy" do
     sign_in :david
     session = users(:david).sessions.last
