@@ -7,9 +7,9 @@ class RuntimeController < ApplicationController
   def stats
     response.headers["Cache-Control"] = "no-store"
     path = ENV.fetch("RUNTIME_STATS_PATH") { Rails.root.join("storage/runtime_stats.json").to_s }
-    render json: JSON.parse(File.read(path))
+    render plain: File.read(path), content_type: "application/json"
   rescue StandardError
-    render json: { available: false, error: "Runtime collector is waiting for its first sample" }, status: :service_unavailable
+    render plain: '{"available":false,"error":"Runtime collector is waiting for its first sample"}', content_type: "application/json", status: :service_unavailable
   end
 
   private
