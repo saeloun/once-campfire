@@ -90,9 +90,12 @@ CPU, memory, throughput and latency use distinct colors and labelled peak
 values with units; missing samples remain visible as gaps. Fresh, stale and
 unavailable telemetry have explicit labels.
 
-The dashboard release is `dqor-campfire:be39e42-3ee23f0`, compiled from
-Campfire `3ee23f0eb6b36cad7d15baa32a5a7695bfbbfd7d` and the already-deployed
+The dashboard release is `dqor-campfire:be39e42-cd46362`, compiled from
+Campfire `cd463624bf1d720d76dd578836c8b6e9fed8919a` and the already-deployed
 Roundhouse `be39e428ef6f3a47719d3ab9a46041133146178a`. The focused check is
-`node test/javascript/runtime_stats_controller_test.mjs`. On deployment,
-purge Cloudflare’s cache for `/assets/controllers/runtime_stats_controller.js`
-and reload the dashboard so browsers receive its updated controller.
+`node test/javascript/runtime_stats_controller_test.mjs`. The importmap versions the
+dashboard controller URL with `?v=dqor-dashboard-20261003`, so existing browser
+sessions fetch the updated controller on their next dashboard navigation.
+The native compiler adds `/assets/` to relative importmap targets; keep this
+pin relative to avoid generating a duplicated asset path. Native and Rails
+sign-in checks passed (33 runs, 134 assertions for the Rails controller checks).
