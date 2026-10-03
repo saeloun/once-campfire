@@ -15,3 +15,5 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/javascript/helpers", under: "helpers"
 pin_all_from "app/javascript/models", under: "models"
 pin_all_from "vendor/javascript/languages", under: "languages"
+
+pin "controllers/runtime_stats_controller", to: "controllers/runtime_stats_controller.js?v=dqor-dashboard-20261003"
