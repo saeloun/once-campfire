@@ -10,7 +10,7 @@
       <%= button_to "Sign in with Google", google_session_path, class: "btn btn--reversed center txt-large", form: { data: { turbo: false } } %>
     <% end %>
 
-    <%= form_with url: session_url, class: "flex flex-column gap" do |form| %>
+    <%= form_with url: session_url, data: { turbo: false }, class: "flex flex-column gap" do |form| %>
       <fieldset class="flex flex-column gap center-block upad">
         <legend class="txt-large txt-align-center"><strong><%= Current.account.name %></strong></legend>
 

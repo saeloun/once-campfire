@@ -13,7 +13,7 @@
         </div>
       <% else %>
         <div class="composer--edit composer--rich-text">
-          <%= form_with model: @message, url: room_message_path(@room, @message), id: dom_id(@message, :form), data: {
+          <%= form_with model: @message, url: room_message_path(@room, @message), method: :patch, id: dom_id(@message, :form), data: {
                 controller: "form", action: "lexxy:file-accept->form#preventAttachment keydown.esc->form#cancel keydown.ctrl+enter->form#submit:prevent keydown.meta+enter->form#submit:prevent" } do |form| %>
             <div class="full-width input input--actor min-width fill-white">
               <%= form.rich_text_area :body,

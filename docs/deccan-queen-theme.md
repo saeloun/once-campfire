@@ -55,7 +55,7 @@ existing transitions. Flash messages show readable notice text. Reduced motion k
 visible for three seconds without movement; animation completion still fires
 to preserve its existing removal behavior.
 
-Only styles, presentation templates and static error pages change. The
+The theme changes styles, presentation templates and static error pages. The
 startup page retains its original ten-second retry. Authentication, Google
 SSO, invitations, role checks, membership, revocation, message rendering and
 delivery logic are unchanged. Room controls retain their existing links,
@@ -64,3 +64,20 @@ form actions, IDs, Turbo frames and Stimulus actions.
 The deployment binary must be compiled through the existing Campfire/Spinel
 asset and build workflow, then exercised with synthetic local data. Source
 changes alone are not evidence that the binary includes or serves the theme.
+
+## Native compatibility
+
+The password sign-in form uses ordinary full-page submission, matching the
+existing Google sign-in form. This preserves the unauthorized response's
+visible flash notice instead of losing it when Turbo reloads the sign-in page.
+Authentication, credential checks, status codes and session handling are unchanged.
+
+The no-room welcome controller explicitly renders `:show`. Rails accepts its
+previous argument-free `render`, but the compiled runtime requires the template
+argument. This fixes the native empty-state response without changing room
+visibility, membership or roles.
+
+The message edit form explicitly uses `method: :patch`. Rails infers PATCH
+from the saved message, while the compiled explicit-URL form defaults to POST
+without this option. The explicit method sends Save to the existing update
+route and preserves its ownership and administrator checks.

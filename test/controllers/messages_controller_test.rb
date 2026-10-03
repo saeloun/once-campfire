@@ -76,6 +76,23 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "edit form submits PATCH to the message and saves its content" do
+    message = @room.messages.where(creator: users(:david)).first
+
+    get edit_room_message_url(@room, message)
+
+    assert_response :success
+    assert_select "form##{dom_id(message, :form)}[action=\"#{room_message_path(@room, message)}\"][method=\"post\"]" do
+      assert_select "input[name=\"_method\"][value=\"patch\"]", count: 1
+    end
+
+    Turbo::StreamsChannel.expects(:broadcast_replace_to).once
+    patch room_message_url(@room, message), params: { message: { body: "Updated through the edit form" } }
+
+    assert_redirected_to room_message_url(@room, message)
+    assert_equal "Updated through the edit form", message.reload.plain_text_body
+  end
+
   test "update updates a message belonging to the user" do
     message = @room.messages.where(creator: users(:david)).first
 
