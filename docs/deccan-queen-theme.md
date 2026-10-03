@@ -81,3 +81,18 @@ The message edit form explicitly uses `method: :patch`. Rails infers PATCH
 from the saved message, while the compiled explicit-URL form defaults to POST
 without this option. The explicit method sends Save to the existing update
 route and preserves its ownership and administrator checks.
+
+## Runtime dashboard
+
+The dashboard keeps the DQOR palette and shows performance metrics before
+build hashes. Native build evidence uses a keyboard-accessible disclosure.
+CPU, memory, throughput and latency use distinct colors and labelled peak
+values with units; missing samples remain visible as gaps. Fresh, stale and
+unavailable telemetry have explicit labels.
+
+The dashboard release is `dqor-campfire:be39e42-3ee23f0`, compiled from
+Campfire `3ee23f0eb6b36cad7d15baa32a5a7695bfbbfd7d` and the already-deployed
+Roundhouse `be39e428ef6f3a47719d3ab9a46041133146178a`. The focused check is
+`node test/javascript/runtime_stats_controller_test.mjs`. On deployment,
+purge Cloudflare’s cache for `/assets/controllers/runtime_stats_controller.js`
+and reload the dashboard so browsers receive its updated controller.
