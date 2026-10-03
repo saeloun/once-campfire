@@ -1,0 +1,66 @@
+# Deccan Queen theme
+
+The standalone Campfire theme uses original artwork already committed to
+[saeloun/dqor-tickets](https://github.com/saeloun/dqor-tickets/tree/de21ebff3a9f0f80aa9182603e1f216fcd1ffc41),
+at source revision `de21ebff3a9f0f80aa9182603e1f216fcd1ffc41`. The logo is copied byte for byte. The original hero artwork is encoded as
+WebP at its unchanged 1536 × 1024 dimensions; no third-party visual assets
+or fonts are downloaded. The source repository's
+MIT license, copyright 2026 Saeloun, is retained verbatim in
+`docs/deccan-queen-assets-LICENSE`. Campfire's existing 37signals MIT license
+remains in `MIT-LICENSE`.
+
+## Asset mapping
+
+| Embedded destination | Source at the pinned revision | SHA-256 |
+| --- | --- | --- |
+| `app/assets/images/deccan-queen/deccan-logo.png` | `public/dqor/deccan-logo.png` | `0a413deb3c1658eaab426d4e9140737a2d8188964d0846c3f506721c0f10e7f3` |
+| `app/assets/images/deccan-queen/hero-bg.webp` | WebP derivative of `public/dqor/hero-bg.jpg` | `f25a73ed54d0dfc3735355c37be529ec2a0ddfba02eecf4ab10573943bdaf00d` |
+
+The source `public/dqor/hero-bg.jpg` is PNG-encoded despite its filename.
+Its original SHA-256 is `d1b3da52438ff663afdb22cb1da4b743146a716e0a6bdbffb218dc7d675a3e46`
+and size is 4,767,292 bytes. The release derivative is 619,522
+bytes, retaining the original dimensions and artwork. Reproduce it from the
+pinned source with the existing `cwebp` tool:
+
+```sh
+git -C /path/to/dqor-tickets show de21ebff3a9f0f80aa9182603e1f216fcd1ffc41:public/dqor/hero-bg.jpg > /tmp/dq-hero-source.png
+cwebp -q 82 -m 6 /tmp/dq-hero-source.png -o app/assets/images/deccan-queen/hero-bg.webp
+```
+
+The artwork appears behind opaque entry panels; the logo appears in entry,
+sidebar and empty states. Message backgrounds remain plain and opaque.
+CSS assets use the native `make assets` workflow's existing relative asset
+references. The compiled service serves the embedded stylesheet and image
+under `/assets`; no Rails/Propshaft rewrite is assumed.
+
+## Palette and typography
+
+Warm ivory `hsl(40 30% 96%)`, ruby/plum `hsl(348 70% 35%)`, rose
+`hsl(20 45% 92%)`, and their dark equivalents derive from the pinned
+`app/assets/stylesheets/global.css`. The adaptation uses dark gray body text,
+16px chat text, 1.4 line height, and the existing message width capped at 80ch.
+Dark small links and primary buttons use `hsl(348 68% 64%)` for contrast;
+unread room labels use the body text color. Inter is preferred when installed, with local sans-serif fallbacks; no font
+service or network dependency is introduced. Typography follows
+[Practical Typography](https://practicaltypography.com/typography-in-ten-minutes.html).
+
+## Integration
+
+`deccan_queen.css` is explicitly linked after the existing asset stylesheets
+and before account custom styles. The explicit link gives deterministic theme
+precedence even when the existing `:all` helper also includes it.
+Light and dark colors follow the existing operating-system preference.
+Reduced motion suppresses decorative entry/loading movement and minimizes
+existing transitions. Flash messages show readable notice text. Reduced motion keeps each notice
+visible for three seconds without movement; animation completion still fires
+to preserve its existing removal behavior.
+
+Only styles, presentation templates and static error pages change. The
+startup page retains its original ten-second retry. Authentication, Google
+SSO, invitations, role checks, membership, revocation, message rendering and
+delivery logic are unchanged. Room controls retain their existing links,
+form actions, IDs, Turbo frames and Stimulus actions.
+
+The deployment binary must be compiled through the existing Campfire/Spinel
+asset and build workflow, then exercised with synthetic local data. Source
+changes alone are not evidence that the binary includes or serves the theme.

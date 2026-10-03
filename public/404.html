@@ -4,6 +4,8 @@
 <head>
   <title>We can’t find that (404)</title>
   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
   <style>
     *,
     *::before,
@@ -119,11 +121,38 @@
       white-space: nowrap;
     }
 
-  </style>
+
+      body {
+        --color-bg: hsl(40 30% 96%);
+        --color-text: hsl(330 10% 17%);
+        --color-border: hsl(30 20% 78%);
+        --color-brand: hsl(348 70% 35%);
+        background-image: radial-gradient(ellipse at top, hsl(20 45% 92%), transparent 70%);
+        font-size: 1rem;
+        line-height: 1.4;
+        min-block-size: 100dvh;
+        block-size: auto;
+        padding: 2rem;
+      }
+      .error { gap: 1.25rem; margin: 0; max-inline-size: 40ch; text-align: center; }
+      .error__img { background-color: var(--color-brand); inline-size: 6rem; padding: 1.5rem; }
+      .error__img svg { fill: hsl(40 30% 96%); max-inline-size: 100%; }
+      .error h1 { font-size: 1.75rem; line-height: 1.25; margin: 0; }
+      .error p { margin: 0; }
+      .error .brand { color: var(--color-brand); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+      .btn:focus-visible { outline: 3px solid var(--color-brand); outline-offset: 4px; }
+      @media (prefers-color-scheme: dark) {
+        body { --color-bg: hsl(330 12% 9%); --color-text: hsl(40 20% 90%); --color-border: hsl(30 12% 58%); --color-brand: hsl(348 68% 58%); background-image: none; }
+        .error__img svg { fill: hsl(330 12% 9%); }
+      }
+    </style>
 </head>
 
 <body>
-  <div class="error">
+  <div class="error" role="main">
+      <p class="brand">Deccan Queen on Rails · Campfire</p>
+      <h1>We can’t find that</h1>
+      <p>This page may have moved, or the link may be incomplete.</p>
     <div class="error__img">
       <svg enable-background="new 0 0 24 24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Not found">
         <path
