@@ -109,7 +109,8 @@ export default class extends Controller {
       const key = svg.dataset.chart
       const values = history.map(sample => sample[key])
       const finite = values.filter(Number.isFinite)
-      const maximum = Math.max(1, ...finite)
+      const peak = finite.length ? Math.max(...finite) : null
+      const maximum = Math.max(1, peak || 0)
       const group = svg.querySelector("g")
       group.replaceChildren()
       let points = []
@@ -129,8 +130,8 @@ export default class extends Controller {
       const format = value => key === "rss_bytes" ? this.bytes(value) : `${this.number(value, key === "rate_per_second" ? 2 : 1)}${key === "cpu_percent" ? "%" : key === "p95_ms" ? " ms" : " req/s"}`
       const formatted = format(values.at(-1))
       this.element.querySelector(`[data-chart-value="${key}"]`).textContent = formatted
-      this.element.querySelector(`[data-chart-peak="${key}"]`).textContent = format(maximum)
-      svg.setAttribute("aria-label", `${key.replaceAll("_", " ")}: current ${formatted}; chart peak ${format(maximum)}`)
+      this.element.querySelector(`[data-chart-peak="${key}"]`).textContent = format(peak)
+      svg.setAttribute("aria-label", `${key.replaceAll("_", " ")}: current ${formatted}; chart peak ${format(peak)}`)
     })
   }
 }

@@ -23,8 +23,11 @@ controller.render({ sampled_at: new Date().toISOString(), history: [{ rss_bytes:
 assert.equal(controller.element.dataset.state, "live")
 assert.equal(fields.get('[data-chart-peak="rss_bytes"]'), "4 MiB")
 assert.match(fields.get("aria-label"), /chart peak 4 MiB/)
+controller.render({ sampled_at: new Date().toISOString(), history: [{ rss_bytes: 0 }] })
+assert.equal(fields.get('[data-chart-peak="rss_bytes"]'), "0 MiB")
 controller.render({ sampled_at: new Date(0).toISOString() })
 assert.equal(controller.element.dataset.state, "stale")
+assert.equal(fields.get('[data-chart-peak="rss_bytes"]'), "—")
 controller.active = true
 await controller.refresh()
 assert.equal(controller.element.dataset.state, "unavailable")
