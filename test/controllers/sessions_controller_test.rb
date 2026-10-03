@@ -57,6 +57,27 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/session_token=.*samesite=lax/i, header)
   end
 
+  test "login and resumption renew the existing permanent cookie lifetime" do
+    https!
+
+    freeze_time do
+      post session_url, params: { email_address: "david@37signals.com", password: "secret123456" }
+      assert_redirected_to root_url
+      assert_match(/expires=#{Regexp.escape(20.years.from_now.httpdate)}/i, response.headers["set-cookie"].to_s)
+      token = parsed_cookies.signed[:session_token]
+
+      travel 1.day
+
+      assert_no_difference -> { Session.count } do
+        get room_url(rooms(:watercooler))
+      end
+
+      assert_response :success
+      assert_equal token, parsed_cookies.signed[:session_token]
+      assert_match(/expires=#{Regexp.escape(20.years.from_now.httpdate)}/i, response.headers["set-cookie"].to_s)
+    end
+  end
+
   test "destroy" do
     sign_in :david
     session = users(:david).sessions.last
