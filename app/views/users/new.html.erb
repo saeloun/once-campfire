@@ -1,5 +1,5 @@
 <% @page_title = "Sign up" %>
-<% @body_class = "signup" %>
+<% @body_class = "signup dq-entry" %>
 
 <% content_for :nav do %>
   <div class="flex-item-justify-end">
@@ -12,6 +12,7 @@
 
 <%= form_with model: @user, url: join_path(params[:join_code]), class: "center" do |form| %>
   <section class="nametag u-relative">
+    <%= render "layouts/deccan_queen_identity", heading: "Join the conversation", description: "Your seat in the Deccan Queen community." %>
     <div class="flex justify-center align-center pad-block">
       <%= image_tag "lanyard.svg", class: "nametag__lanyard", aria: { hidden: "true" } %>
     </div>

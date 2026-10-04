@@ -3,7 +3,7 @@ class WelcomeController < ApplicationController
     if Current.user.rooms.any?
       redirect_to room_url(last_room_visited)
     else
-      render
+      render :show
     end
   end
 end

@@ -7,7 +7,7 @@
     <meta name="view-transition" content="same-origin">
     <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#f8f6f2" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#141110" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#211a1d" media="(prefers-color-scheme: dark)">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -22,6 +22,7 @@
     <%= tag.link rel: "apple-touch-icon", href: fresh_account_logo_path %>
 
     <%= stylesheet_link_tag :all, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "deccan_queen", "data-turbo-track": "reload" %>
     <%= custom_styles_tag %>
 
     <%= javascript_importmap_tags %>
@@ -29,7 +30,7 @@
     <%= yield :head %>
   </head>
 
-  <body class="<%= body_classes %>" data-controller="local-time lightbox">
+  <body class="deccan-queen <%= body_classes %>" data-controller="local-time lightbox">
     <a href="#main-content" class="skip-navigation btn">Skip to main content</a>
 
     <nav id="nav">
@@ -45,7 +46,7 @@
             <%= image_tag "check.svg", aria: { hidden: true }, size: 24, class: "colorize--white" %></span>
           <% end %>
         </div>
-        <span class="for-screen-reader" role="alert" aria-atomic="true"><%= notice %></span>
+        <span class="flash__message" role="alert" aria-atomic="true"><%= notice %></span>
       </div>
     <% end %>
 

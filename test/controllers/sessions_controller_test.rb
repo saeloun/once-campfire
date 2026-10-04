@@ -7,6 +7,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "new" do
     get new_session_url
     assert_response :success
+    assert_select "form[action=\"#{session_url}\"][data-turbo=\"false\"]", count: 1
   end
 
   test "new redirects to first run when no users exist" do
@@ -40,6 +41,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     post session_url, params: { email_address: "david@37signals.com", password: "wrong" }
 
     assert_response :unauthorized
+    assert_select ".flash__message", text: "Too many requests or unauthorized."
+    assert_select "form[action=\"#{session_url}\"][data-turbo=\"false\"]", count: 1
     assert_nil parsed_cookies.signed[:session_token]
   end
 

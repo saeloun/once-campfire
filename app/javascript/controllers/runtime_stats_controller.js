@@ -25,6 +25,7 @@ export default class extends Controller {
       if (this.active) this.render(data)
     } catch (error) {
       if (this.active) {
+        this.element.dataset.state = "unavailable"
         this.field("live", "Data unavailable")
         this.field("updated", error.message)
       }
@@ -52,6 +53,7 @@ export default class extends Controller {
   render(data) {
     const system = data.system || {}, native = data.native || {}, requests = data.requests || {}, database = data.database || {}
     const age = (Date.now() - Date.parse(data.sampled_at)) / 1000
+    this.element.dataset.state = age > 20 ? "stale" : "live"
     this.field("live", age > 20 ? "Sample stale" : "Live · 5s")
     this.field("updated", `${age > 20 ? "Stale sample" : "Last sampled"} ${new Date(data.sampled_at).toLocaleString()}`)
     this.field("proof", native.elf === true ? "ELF native executable" : native.elf === false ? "Executable is not ELF" : "Executable unavailable")
@@ -107,7 +109,8 @@ export default class extends Controller {
       const key = svg.dataset.chart
       const values = history.map(sample => sample[key])
       const finite = values.filter(Number.isFinite)
-      const maximum = Math.max(1, ...finite)
+      const peak = finite.length ? Math.max(...finite) : null
+      const maximum = Math.max(1, peak || 0)
       const group = svg.querySelector("g")
       group.replaceChildren()
       let points = []
@@ -124,10 +127,11 @@ export default class extends Controller {
         else flush()
       })
       flush()
-      const current = values.at(-1)
-      const formatted = key === "rss_bytes" ? this.bytes(current) : `${this.number(current, key === "rate_per_second" ? 2 : 1)}${key === "cpu_percent" ? "%" : key === "p95_ms" ? " ms" : " req/s"}`
+      const format = value => key === "rss_bytes" ? this.bytes(value) : `${this.number(value, key === "rate_per_second" ? 2 : 1)}${key === "cpu_percent" ? "%" : key === "p95_ms" ? " ms" : " req/s"}`
+      const formatted = format(values.at(-1))
       this.element.querySelector(`[data-chart-value="${key}"]`).textContent = formatted
-      svg.setAttribute("aria-label", `${key.replaceAll("_", " ")}: current ${formatted}; chart peak ${this.number(maximum, 1)}`)
+      this.element.querySelector(`[data-chart-peak="${key}"]`).textContent = format(peak)
+      svg.setAttribute("aria-label", `${key.replaceAll("_", " ")}: current ${formatted}; chart peak ${format(peak)}`)
     })
   }
 }

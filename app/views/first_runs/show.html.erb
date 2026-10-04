@@ -1,8 +1,9 @@
 <% @page_title = "Set up Campfire" %>
-<% @body_class = "signup" %>
+<% @body_class = "signup dq-entry" %>
 
 <%= form_with model: @user, url: first_run_path, class: "center max-width" do |form| %>
   <section class="nametag u-relative">
+    <%= render "layouts/deccan_queen_identity", heading: "All aboard", description: "Set up a place for your community to connect." %>
     <div class="flex justify-center align-center pad-block">
       <%= image_tag "lanyard.svg", class: "nametag__lanyard", aria: { hidden: "true" } %>
     </div>

@@ -1,15 +1,16 @@
 <% @page_title = "Sign in" %>
+<% @body_class = "dq-entry" %>
 <% turbo_page_requires_reload %>
 
 <section class="txt-align-center">
-  <div class="panel <%= "shake" if flash[:alert] %>">
-    <%= account_logo_tag style: "center margin-block-end txt-xx-large" %>
+  <div class="panel dq-entry__panel <%= "shake" if flash[:alert] %>">
+    <%= render "layouts/deccan_queen_identity", heading: "Welcome aboard", description: "Good conversations start here. Sign in to join your community." %>
 
     <% if ENV["GOOGLE_LOGIN_ENABLED"] == "true" %>
       <%= button_to "Sign in with Google", google_session_path, class: "btn btn--reversed center txt-large", form: { data: { turbo: false } } %>
     <% end %>
 
-    <%= form_with url: session_url, class: "flex flex-column gap" do |form| %>
+    <%= form_with url: session_url, data: { turbo: false }, class: "flex flex-column gap" do |form| %>
       <fieldset class="flex flex-column gap center-block upad">
         <legend class="txt-large txt-align-center"><strong><%= Current.account.name %></strong></legend>
 
