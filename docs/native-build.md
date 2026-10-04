@@ -109,7 +109,7 @@ when `spin` is absent. Resolve unsupported constructs rather than enabling
 ```sh
 container_id=$(docker create --platform linux/amd64 campfire-native:4683831)
 docker cp "$container_id":/app/campfire ./campfire-linux-amd64
-docker rm "$container_id"
+docker rm -v "$container_id"
 file campfire-linux-amd64
 ```
 
