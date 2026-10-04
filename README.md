@@ -11,6 +11,12 @@ expect, including:
 - @mentions
 - API, with support for bot integrations
 
+## Saeloun native build
+
+This fork powers Deccan Queen on Rails chat. See the [native build guide](docs/native-build.md)
+for the verified Campfire/Roundhouse/Spinel revisions, source-to-binary conversion,
+Linux AMD64 packages, checks and deployment configuration.
+
 ## Running your own Campfire instance
 
 Campfire's Docker image contains everything needed for a fully-functional,
