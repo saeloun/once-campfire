@@ -5,8 +5,12 @@ class Message < ApplicationRecord
   belongs_to :creator, class_name: "User", default: -> { Current.user }
 
   has_many :boosts, dependent: :destroy
+  has_one :talk_question
+  has_many :talk_hidden_messages, dependent: :destroy
 
   has_rich_text :body
+
+  before_destroy :destroy_talk_question
 
   before_create -> { self.client_message_id ||= Random.uuid } # Bots don't care
   after_create_commit -> { room.receive(self) }
@@ -41,4 +45,8 @@ class Message < ApplicationRecord
       Sound.find_by_name match[:name]
     end
   end
+  private
+    def destroy_talk_question
+      talk_question&.destroy
+    end
 end

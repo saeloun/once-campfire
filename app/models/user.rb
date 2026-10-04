@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :push_subscriptions, class_name: "Push::Subscription", dependent: :delete_all
 
   has_many :boosts, dependent: :destroy, foreign_key: :booster_id
+  has_many :talk_votes, dependent: :destroy
   has_many :searches, dependent: :delete_all
 
   has_many :sessions, dependent: :destroy

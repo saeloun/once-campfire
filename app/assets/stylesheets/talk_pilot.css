@@ -1,0 +1,134 @@
+.talk-pilot {
+  --talk-cream: #f8f5ef;
+  --talk-plum: #70233f;
+  --talk-ink: #352b30;
+  --talk-muted: #65575e;
+  color: var(--talk-ink);
+  background: var(--talk-cream);
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  border: 1px solid #dcd0d1;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  max-width: 48rem;
+  margin: 1.5rem auto;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+.talk-pilot *, .talk-pilot *::before, .talk-pilot *::after { box-sizing: border-box; }
+.talk-pilot a { color: var(--talk-plum); text-decoration: underline; text-underline-offset: .18em; }
+.talk-pilot h1 { font-size: 2rem; font-weight: 650; line-height: 1.2; margin: 1rem 0 .5rem; letter-spacing: -.025em; }
+.talk-pilot h2 { font-size: 1.35rem; line-height: 1.25; margin: 0; }
+.talk-pilot h3 { font-size: 1.1rem; margin: 1rem 0 .5rem; }
+.talk-identity { display: flex; align-items: center; gap: .75rem; }
+.talk-identity img { border-radius: .7rem; flex-shrink: 0; }
+.talk-eyebrow { color: var(--talk-plum); font-size: .75rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+.talk-speaker { margin: 0; font-size: 1.15rem; font-weight: 550; }
+.talk-time { margin: .3rem 0 1rem; color: var(--talk-muted); font-size: .95rem; }
+.talk-mode { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid #d5b5c0; border-radius: 2rem; background: #f0e2e7; color: var(--talk-plum); padding: .4rem .75rem; font-size: .85rem; font-weight: 650; white-space: nowrap; }
+.talk-mode::before { content: ""; width: .45rem; height: .45rem; background: currentColor; border-radius: 50%; }
+.talk-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: .3rem; gap: .3rem; background: #eae3de; border-radius: .85rem; margin: 1.5rem 0; }
+.talk-tabs a { text-align: center; padding: .75rem; min-height: 48px; text-decoration: none; font-weight: 600; border-radius: .6rem; }
+.talk-tabs [aria-current] { background: #fffdfa; box-shadow: 0 1px 3px #352b3018; }
+.talk-ask { margin: 1.5rem 0 0; scroll-margin-top: 1rem; }
+.talk-ask label { font-size: 1.3rem; font-weight: 650; }
+.talk-ask #talk-ask-help { margin: .35rem 0 .85rem; color: var(--talk-muted); font-size: 1rem; }
+.talk-ask textarea { display: block; width: 100%; resize: vertical; min-height: 4.5rem; border: 1px solid #9c858f; border-radius: .7rem; padding: 1rem; background: #fffdfa; color: var(--talk-ink); font: inherit; line-height: 1.4; margin-bottom: .75rem; }
+.talk-ask textarea::placeholder { color: #75636d; }
+.talk-ask button { width: 100%; }
+.talk-pilot button, .talk-pilot .btn { color: #fffdfa; background: var(--talk-plum); border: 1px solid var(--talk-plum); padding: .75rem 1rem; border-radius: .7rem; font: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; min-height: 48px; }
+.talk-pilot button:disabled { background: #e8dce1; color: #5c4050; border-color: #cbb7c1; cursor: default; }
+.talk-pilot button:focus-visible, .talk-pilot a:focus-visible, .talk-pilot textarea:focus-visible, .talk-pilot summary:focus-visible { outline: 3px solid #a86516; outline-offset: 3px; }
+.talk-pilot [hidden] { display: none !important; }
+.talk-privacy, .talk-status { color: var(--talk-muted); font-size: .875rem; margin: .75rem 0; }
+.talk-status { min-height: 1.4em; }
+.talk-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; margin: 1.5rem 0 1rem; }
+.talk-section-heading > span { color: var(--talk-muted); font-size: .9rem; }
+.talk-questions, .talk-stage-messages { list-style: none; padding: 0; display: grid; gap: 1rem; margin: 0; }
+.talk-question, .talk-stage-message { padding: 1.25rem; border: 1px solid #d3c5cb; border-radius: .9rem; background: #fffdfa; }
+.talk-question[data-active="true"] { border: 2px solid var(--talk-plum); background: #f6e9ee; }
+.talk-question-meta { display: flex; justify-content: space-between; align-items: center; gap: .75rem; margin-bottom: .75rem; }
+.talk-badge { color: var(--talk-plum); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.talk-votes { color: var(--talk-muted); font-size: .85rem; white-space: nowrap; }
+.talk-question p { font-size: 1.25rem; line-height: 1.4; margin: 0; white-space: pre-wrap; }
+.talk-stage-message p { margin: 0 0 .75rem; white-space: pre-wrap; }
+.talk-controls, .talk-question-actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+.talk-question-actions button { background: #fffdfa; color: var(--talk-plum); font-size: .95rem; }
+.talk-question-actions button:disabled { background: #f0e4e9; }
+.talk-moderator { border: 1px solid #c8b6be; border-radius: .8rem; padding: 1rem; margin: 1.5rem 0; }
+.talk-moderator summary { min-height: 48px; font-weight: 650; cursor: pointer; }
+.talk-control-group p { color: var(--talk-muted); margin: .75rem 0 .4rem; font-size: .85rem; }
+.talk-control-group .talk-controls { margin-top: 0; }
+.talk-moderator button { color: var(--talk-plum); background: #fffdfa; }
+.talk-moderator button[aria-pressed="true"] { background: var(--talk-plum); color: #fffdfa; }
+.talk-moderator .talk-stage-messages { margin-top: .75rem; }
+.talk-empty { background: #eee7e0; border-radius: .85rem; padding: 1.5rem; }
+.talk-empty p { max-width: 45ch; color: var(--talk-muted); margin-bottom: 0; }
+.talk-channel-notice { display: flex; flex-wrap: wrap; gap: .25rem 1rem; align-items: baseline; font-size: 1rem; margin: .5rem 1rem; }
+.talk-channel-notice p { flex-basis: 100%; margin: 0; font-size: .875rem; }
+.talk-stage { margin: 0; background: #231a20; color: #fff6ed; }
+.talk-stage main { display: block; height: 100svh; }
+.talk-stage .talk-pilot { --talk-ink: #fff6ed; --talk-plum: #efb6ca; --talk-muted: #d2bdc7; border: 0; background: #231a20; border-radius: 0; max-width: none; margin: 0; height: 100svh; padding: 2.5vh 3vw; display: flex; flex-direction: column; gap: 1.2vh; font-size: 42px; line-height: 1.2; }
+.talk-stage-header { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 1.5rem; align-items: center; }
+.talk-stage-header img { border-radius: 1rem; }
+.talk-stage .talk-pilot h1 { font-size: 38px; line-height: 1.12; margin: .25rem 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.talk-stage .talk-eyebrow { font-size: 16px; }
+.talk-stage .talk-speaker { font-size: 28px; margin: 0; }
+.talk-stage .talk-mode { font-size: 28px; padding: .6rem 1rem; background: #553143; border-color: #86536a; }
+.talk-stage .talk-status { font-size: 26px; margin: 0; }
+.talk-stage .talk-questions, .talk-stage .talk-stage-messages { gap: 1.2vh; }
+.talk-stage .talk-questions:empty, .talk-stage .talk-stage-messages:empty { display: none; }
+.talk-stage .talk-question, .talk-stage .talk-stage-message { border: 1px solid #785362; border-radius: 1rem; background: #35232d; padding: 1.3vh 1.5vw; }
+.talk-stage .talk-question[data-active="true"] { background: #4b2d3b; border: 2px solid #efb6ca; }
+.talk-stage .talk-question p { font-size: 34px; line-height: 1.2; white-space: normal; margin: 0; }
+.talk-stage .talk-question[data-active="true"] p { font-size: 72px; line-height: 1.18; letter-spacing: -.02em; }
+.talk-stage .talk-question[data-length="long"] p { font-size: 42px; }
+.talk-stage .talk-question:not([data-active="true"]) p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.talk-stage .talk-question-meta { margin-bottom: .5rem; }
+.talk-stage .talk-badge, .talk-stage .talk-votes { font-size: 28px; letter-spacing: .05em; }
+.talk-stage .talk-question:not([data-active="true"]) .talk-badge { visibility: visible; }
+.talk-stage .talk-questions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.talk-stage .talk-question:first-child { grid-column: 1 / -1; }
+.talk-stage .talk-stage-message p { font-size: 44px; line-height: 1.25; margin: 0; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.talk-stage .talk-empty { background: transparent; margin: auto; padding: 0; }
+.talk-stage .talk-empty h2 { font-size: 72px; }
+.talk-stage .talk-empty p { font-size: 36px; }
+.talk-stage footer { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 2rem; font-size: 28px; padding-top: .5rem; }
+.talk-stage footer strong { font-weight: 550; }
+.talk-stage footer span { color: var(--talk-muted); }
+.talk-stage .talk-pilot[data-projection="blank"] > * { visibility: hidden; }
+@media (prefers-reduced-motion: no-preference) { .talk-pilot button { transition: background-color .15s ease; } }
+@media (max-width: 600px) { .talk-pilot { margin: .5rem; padding: 1.25rem; border-radius: 1rem; } .talk-pilot h1 { font-size: 1.5rem; } .talk-question { padding: 1rem; } .talk-stage .talk-pilot { margin: 0; } }
+
+@media (max-width: 600px) { .talk-ask { padding: 1rem 0 .5rem; background: var(--talk-cream); border-top: 1px solid #d3c5cb; } .talk-ask label { font-size: 1.1rem; } .talk-ask #talk-ask-help { margin: .25rem 0 .5rem; font-size: .875rem; } .talk-ask textarea { padding: .75rem; margin-bottom: .5rem; } .talk-privacy { font-size: .8rem; } }
+
+.talk-metadata { display: flex; gap: .75rem; align-items: baseline; flex-wrap: wrap; margin-bottom: .75rem; }
+.talk-metadata .talk-speaker { font-size: 1rem; }
+.talk-metadata .talk-time { margin: 0; font-size: .875rem; }
+.talk-header-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; }
+.talk-ask-link { display: inline-flex; align-items: center; min-height: 48px; font-size: .95rem; font-weight: 600; }
+.talk-status:empty { display: none; }
+.talk-tabs [data-talk-pilot-target="count"] { font-size: .85em; font-weight: 450; }
+@media (max-width: 600px) { .talk-pilot { padding: 1rem; } .talk-pilot h1 { margin: .65rem 0 .5rem; } .talk-eyebrow { font-size: .7rem; } .talk-tabs { margin: .75rem 0 .75rem; } .talk-tabs a { padding: .65rem .25rem; } }
+.talk-stage .talk-question[data-active="true"][data-length="short"] { padding-block: 3.3vh; }
+.talk-stage .talk-question { background: #2c252a; border-color: #5a4b54; }
+.talk-stage .talk-question[data-active="true"] { background: #f8f5ef; color: #352b30; border-color: #f8f5ef; padding-inline: 2.5vw; }
+.talk-stage .talk-question[data-active="true"] .talk-badge { color: #70233f; }
+.talk-stage .talk-question[data-active="true"] .talk-votes { color: #65575e; }
+.talk-stage .talk-stage-message { background: transparent; border: 0; border-bottom: 1px solid #5a4b54; border-radius: 0; padding: 2vh 1.5vw; }
+.talk-stage .talk-stage-message .talk-badge { color: #d2bdc7; font-size: 23px; font-weight: 550; }
+
+.talk-identity { position: relative; }
+.talk-identity .talk-eyebrow { flex: 1; }
+.talk-switcher { flex-shrink: 0; font-size: .8rem; }
+.talk-switcher summary { min-height: 44px; display: flex; align-items: center; gap: .25rem; cursor: pointer; color: var(--talk-plum); font-weight: 600; }
+.talk-switcher summary::after { content: "⌄"; }
+.talk-switcher nav { position: absolute; z-index: 2; top: 100%; right: 0; width: min(22rem, 100%); padding: .5rem; border: 1px solid #c8b6be; border-radius: .7rem; background: #fffdfa; box-shadow: 0 8px 24px #352b3020; }
+.talk-switcher a { display: block; padding: .75rem; min-height: 48px; font-size: 1rem; }
+.talk-switcher [aria-current] { font-weight: 650; background: #f0e2e7; border-radius: .4rem; }
+@media (max-width: 600px) { .talk-pilot h1 { margin-top: .35rem; } .talk-tabs { margin-top: .5rem; } .talk-metadata { margin-bottom: .5rem; } }
+
+.talk-ask-feedback { font-size: .95rem; font-weight: 550; color: var(--talk-plum); margin: .75rem 0; }
+
+.talk-stage .talk-question[data-length="medium"] p { font-size: 64px; }

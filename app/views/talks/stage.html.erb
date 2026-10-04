@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Talk stage · Campfire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= current_user_meta_tags %>
+    <%= script_aware_action_cable_meta_tag %>
+    <%= stylesheet_link_tag :all %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="talk-stage"><main>
+    <section class="talk-pilot" data-controller="talk-pilot" data-talk-pilot-snapshot-value="<%= room_talk_snapshot_path(@room, stage: "true") %>" data-talk-pilot-stage-value="true">
+      <header class="talk-stage-header">
+        <%= image_tag "deccan-queen/deccan-logo.png", alt: "", width: 64, height: 64 %>
+        <div><p class="talk-eyebrow">Deccan Queen on Rails<% if ENV["TALK_PILOT_DEMO"] == "true" %> · Demo<% end %></p><h1><%= @talk.title %></h1><p class="talk-speaker"><%= @talk.speaker %></p></div>
+        <span class="talk-mode" data-talk-pilot-target="mode">Connecting</span>
+      </header>
+      <p class="talk-status" data-talk-pilot-target="status" role="status">Connecting to the stage…</p>
+      <ol class="talk-stage-messages" data-talk-pilot-target="messages" aria-label="Live talk messages"></ol>
+      <ol class="talk-questions" data-talk-pilot-target="questions" aria-label="Live talk questions"></ol>
+      <div class="talk-empty" data-talk-pilot-target="empty" hidden><h2>What would you like to ask?</h2><p>Open Questions in this talk channel.</p></div>
+      <footer><strong>Ask the speaker · Open Questions in the talk channel</strong><span><% if ENV["TALK_PILOT_DEMO"] == "true" %>Demo · local preview<% else %>Join · <%= request.base_url %><%= room_path(@room) %><% end %></span></footer>
+    </section>
+  </main></body>
+</html>

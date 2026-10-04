@@ -1,4 +1,7 @@
 <% content_for :footer do %>
+  <% if TalkSlot.enabled? && !room.direct? && TalkSlot.find_by(room_id: room.id) %>
+    <div class="talk-channel-notice"><strong>Live talk channel</strong><%= link_to "Questions →", room_talk_path(room), target: "_blank", rel: "noopener" %><p>Chat may appear on stage. Ask with /ask or open Questions.</p></div>
+  <% end %>
   <div class="composer flex align-end gap position-relative"
       data-controller="typing-notifications" data-typing-notifications-active-class="typing-indicator--active">
     <%= link_to searches_path, class: "btn flex-item-no-shrink margin-block-end composer__context-btn", style: "view-transition-name: input-switcher" do %>
