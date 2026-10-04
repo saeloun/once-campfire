@@ -139,7 +139,7 @@ browser-coverage limits are recorded in `validation.md`.
 `GOOGLE_LOGIN_ENABLED=true` delegates authentication to the main DQOR site,
 which owns Google/email-link login and recovery. Campfire redeems a single-use
 grant, matches the verified email to its own user and creates its own session.
-The reference callback is `https://chat.deccanqueenonrails.com/session/google`.
+The reference callback is `https://chat.deccanqueenonrails.com/session/google/callback`.
 Google's OAuth callback belongs to the main DQOR app. A different identity
 provider or hostname needs corresponding application and callback changes;
 toggling the environment flag does not configure an identity provider.
