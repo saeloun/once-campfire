@@ -17,6 +17,30 @@ class GoogleSessionsControllerTest < ActionDispatch::IntegrationTest
     @environment.each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
   end
 
+  test "DQOR owns sign-in and registration when enabled" do
+    get new_session_url
+    assert_select "form[action='#{google_session_path}']", count: 1
+    assert_select "input[type='password']", count: 0
+    assert_select "input[type='email']", count: 0
+
+    get join_url(accounts(:signal).join_code)
+    assert_select "form[action='#{google_session_path}']", count: 1
+    assert_select "input[name='join_code'][value='#{accounts(:signal).join_code}']", count: 1
+    assert_select "input[type='password']", count: 0
+  end
+
+  test "DQOR delegation rejects direct password login and unverified registration" do
+    assert_no_difference -> { Session.count } do
+      post session_url, params: { email_address: users(:david).email_address, password: "secret123456" }
+    end
+    assert_redirected_to new_session_url
+
+    assert_no_difference [ -> { User.count }, -> { Session.count } ] do
+      post join_url(accounts(:signal).join_code), params: { user: { name: "Unverified", email_address: "unverified@example.com", password: "secret123456" } }
+    end
+    assert_redirected_to join_url(accounts(:signal).join_code)
+  end
+
   test "disabled login hides both buttons and rejects endpoints" do
     ENV["GOOGLE_LOGIN_ENABLED"] = "false"
     get new_session_url
