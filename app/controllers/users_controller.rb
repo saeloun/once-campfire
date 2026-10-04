@@ -9,6 +9,8 @@ class UsersController < ApplicationController
   end
 
   def create
+    return redirect_to join_url(params[:join_code]) if ENV["GOOGLE_LOGIN_ENABLED"] == "true"
+
     @user = User.create!(user_params)
     start_new_session_for @user
     redirect_to root_url

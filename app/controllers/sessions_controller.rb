@@ -8,6 +8,8 @@ class SessionsController < ApplicationController
   end
 
   def create
+    return redirect_to new_session_url if ENV["GOOGLE_LOGIN_ENABLED"] == "true"
+
     if user = User.active.authenticate_by(email_address: params[:email_address], password: params[:password])
       start_new_session_for user
       redirect_to post_authenticating_url
