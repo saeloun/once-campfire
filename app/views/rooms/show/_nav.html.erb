@@ -16,5 +16,9 @@
     <span class="for-screen-reader">Settings for this <%= room.direct? ? "Ping" : "room" %></span>
   <% end %>
 
+  <% if TalkSlot.enabled? && !room.direct? && TalkSlot.find_by(room_id: room.id) %>
+    <%= link_to "Talk questions · /ask", room_talk_path(room), target: "_blank", rel: "noopener", class: "btn" %>
+  <% end %>
+
   <%= render "rooms/involvements/bell", room: room %>
 <% end %>

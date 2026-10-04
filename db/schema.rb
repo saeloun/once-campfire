@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2025_12_12_154340) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_04_010000) do
   create_table "accounts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "custom_styles"
@@ -144,6 +144,57 @@ ActiveRecord::Schema[8.2].define(version: 2025_12_12_154340) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "talk_hidden_messages", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "message_id", null: false
+    t.integer "talk_slot_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_talk_hidden_messages_on_message_id"
+    t.index ["talk_slot_id", "message_id"], name: "index_talk_hidden_messages_on_talk_slot_id_and_message_id", unique: true
+    t.index ["talk_slot_id"], name: "index_talk_hidden_messages_on_talk_slot_id"
+  end
+
+  create_table "talk_questions", force: :cascade do |t|
+    t.boolean "answered", default: false, null: false
+    t.text "body", null: false
+    t.string "client_message_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "hidden", default: false, null: false
+    t.integer "message_id", null: false
+    t.integer "talk_slot_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_talk_questions_on_message_id", unique: true
+    t.index ["talk_slot_id", "client_message_id"], name: "index_talk_questions_on_talk_slot_id_and_client_message_id", unique: true
+    t.index ["talk_slot_id"], name: "index_talk_questions_on_talk_slot_id"
+  end
+
+  create_table "talk_slots", force: :cascade do |t|
+    t.bigint "active_question_id"
+    t.datetime "created_at", null: false
+    t.datetime "ends_at", null: false
+    t.string "mode", default: "chat", null: false
+    t.string "projection", default: "live", null: false
+    t.integer "room_id", null: false
+    t.string "speaker", null: false
+    t.datetime "starts_at", null: false
+    t.string "time_zone", default: "Asia/Kolkata", null: false
+    t.string "title", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id"], name: "index_talk_slots_on_room_id", unique: true
+    t.index ["uid"], name: "index_talk_slots_on_uid", unique: true
+  end
+
+  create_table "talk_votes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "talk_question_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["talk_question_id", "user_id"], name: "index_talk_votes_on_talk_question_id_and_user_id", unique: true
+    t.index ["talk_question_id"], name: "index_talk_votes_on_talk_question_id"
+    t.index ["user_id"], name: "index_talk_votes_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.text "bio"
     t.string "bot_token"
@@ -175,6 +226,13 @@ ActiveRecord::Schema[8.2].define(version: 2025_12_12_154340) do
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "searches", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "talk_hidden_messages", "messages", on_delete: :cascade
+  add_foreign_key "talk_hidden_messages", "talk_slots", on_delete: :cascade
+  add_foreign_key "talk_questions", "messages", on_delete: :cascade
+  add_foreign_key "talk_questions", "talk_slots", on_delete: :cascade
+  add_foreign_key "talk_slots", "rooms", on_delete: :cascade
+  add_foreign_key "talk_votes", "talk_questions", on_delete: :cascade
+  add_foreign_key "talk_votes", "users", on_delete: :cascade
   add_foreign_key "webhooks", "users"
 
   # Virtual tables defined in this database.

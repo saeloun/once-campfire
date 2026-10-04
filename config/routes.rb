@@ -65,6 +65,12 @@ Rails.application.routes.draw do
   end
 
   resources :rooms do
+    get "talk", to: "talks#show", as: :talk
+    get "talk/stage", to: "talks#stage", as: :talk_stage
+    get "talk/snapshot", to: "talks#snapshot", as: :talk_snapshot
+    post "talk/vote", to: "talks#vote", as: :talk_vote
+    post "talk/moderate", to: "talks#moderate", as: :talk_moderate
+
     resources :messages
 
     nested do

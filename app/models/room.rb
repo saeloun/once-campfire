@@ -19,8 +19,11 @@ class Room < ApplicationRecord
 
   has_many :users, through: :memberships
   has_many :messages, dependent: :destroy
+  has_one :talk_slot
 
   belongs_to :creator, class_name: "User", default: -> { Current.user }
+
+  before_destroy :destroy_talk_slot
 
   validate :direct_rooms_keep_their_type, on: :update
 
@@ -67,6 +70,10 @@ class Room < ApplicationRecord
   end
 
   private
+    def destroy_talk_slot
+      talk_slot&.destroy
+    end
+
     # Open and closed rooms convert into each other freely. A direct room can't become
     # either: its participants agreed to a private conversation, not to one whose
     # audience someone else gets to widen afterwards.

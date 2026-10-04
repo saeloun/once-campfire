@@ -19,12 +19,57 @@ class MessagesController < ApplicationController
 
   def create
     set_room
-    @message = @room.messages.create_with_attachment!(message_params)
+    talk = TalkSlot.find_by(room_id: @room.id) if TalkSlot.enabled? && Current.user.active? && !Current.user.bot? && !@room.direct?
+    if talk
+      lock_retries = 0
+      begin
+        acquired_talk_lock = false
+        TalkSlot.transaction do
+          acquire_talk_write_lock(talk)
+          acquired_talk_lock = true
+          preview = Message.new(message_params)
+          question_body = talk.question_body!(preview)
+          existing = talk.talk_questions.find_by(client_message_id: preview.client_message_id) if question_body
+          if existing
+            @replayed_talk_message = true
+            @message = talk.retry_message!(preview.client_message_id, Current.user)
+          else
+            @message = @room.messages.create_with_attachment!(message_params)
+            talk.capture_question!(@message) if question_body
+          end
+        end
+      rescue RuntimeError => error
+        raise unless !acquired_talk_lock && error.message.include?("Db.exec failed (5): database is locked")
 
-    @message.broadcast_create
-    deliver_webhooks_to_bots
+        lock_retries += 1
+        if lock_retries <= 2
+          sleep(0.05 * lock_retries)
+          retry
+        end
+        response.headers["Retry-After"] = "1"
+        head :service_unavailable
+        return
+      rescue ArgumentError => error
+        render plain: error.message, status: :unprocessable_entity
+        return
+      rescue ActiveRecord::RecordNotUnique
+        @replayed_talk_message = true
+        @message = talk.retry_message!(message_params[:client_message_id], Current.user)
+      end
+    else
+      @message = @room.messages.create_with_attachment!(message_params)
+    end
+
+    unless @replayed_talk_message
+      @message.broadcast_create
+      deliver_webhooks_to_bots
+    end
   rescue ActiveRecord::RecordNotFound
-    render action: :room_not_found
+    if talk
+      head :not_found
+    else
+      render action: :room_not_found
+    end
   end
 
   def show
@@ -50,6 +95,10 @@ class MessagesController < ApplicationController
   end
 
   private
+    def acquire_talk_write_lock(talk)
+      TalkSlot.where(id: talk.id).update_all(updated_at: Time.current)
+    end
+
     def set_message
       @message = @room.messages.find(params[:id])
     end
