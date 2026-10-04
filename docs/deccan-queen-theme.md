@@ -2,7 +2,7 @@
 
 The standalone Campfire theme uses original artwork already committed to
 [saeloun/dqor-tickets](https://github.com/saeloun/dqor-tickets/tree/de21ebff3a9f0f80aa9182603e1f216fcd1ffc41),
-at source revision `de21ebff3a9f0f80aa9182603e1f216fcd1ffc41`. The logo is copied byte for byte. The original hero artwork is encoded as
+at source revision `de21ebff3a9f0f80aa9182603e1f216fcd1ffc41`. The original logo is copied byte for byte. The original hero artwork is encoded as
 WebP at its unchanged 1536 × 1024 dimensions; no third-party visual assets
 or fonts are downloaded. The source repository's
 MIT license, copyright 2026 Saeloun, is retained verbatim in
@@ -99,3 +99,21 @@ sessions fetch the updated controller on their next dashboard navigation.
 The native compiler adds `/assets/` to relative importmap targets; keep this
 pin relative to avoid generating a duplicated asset path. Native and Rails
 sign-in checks passed (33 runs, 134 assertions for the Rails controller checks).
+
+## Sharp logo (2026-10-04)
+
+`app/assets/images/deccan-queen/deccan-logo-sharp.png` is a 1254 × 1254
+presentation derivative of the original DQOR badge, produced with the built-in
+imagegen tool. It preserves the train, ruby, shield, wording and palette, with
+cleaner edges and less outer padding. SHA-256:
+`eb91c4a2794ef4abceea214723c122845335a953291cff5ac22a169224098445`.
+
+The sign-in, sidebar, chat header, room invitation, empty state, dashboard and
+page icons use the versioned asset path so cached account-logo variants cannot
+blur the branding. Account logo upload/settings and PWA icons retain their
+existing behavior. The original artwork and license remain in the source.
+
+Edit prompt: improve resolution, crispness and small-logo readability; preserve
+the train, smoke, ruby, shield, banner, palette and exact wording “DECCAN QUEEN”
+and “ON RAILS”; clean the edges, reduce outer padding to fill about 88% of the
+canvas, and keep the peach background. No new elements, text or mockup.

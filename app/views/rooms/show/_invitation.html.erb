@@ -2,7 +2,7 @@
   <div id="system_welcome" class="message message--formatted txt-align-center center">
     <div class="message__body center">
       <div class="message__body-content position-relative">
-        <%= account_logo_tag style: "center margin-block-end txt-large" %>
+        <figure class="account-logo avatar center margin-block-end txt-large"><%= image_tag "deccan-queen/deccan-logo-sharp.png", alt: "Deccan Queen on Rails", width: 1254, height: 1254 %></figure>
         <div class="flex align-center gap">
           <div class="system-welcome--translation">
             <%= translation_button(:invite_message) %>

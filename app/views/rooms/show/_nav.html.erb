@@ -1,5 +1,5 @@
 <% content_for :nav do %>
-  <%= account_logo_tag if Current.account.logo.attached? %>
+  <figure class="account-logo avatar"><%= image_tag "deccan-queen/deccan-logo-sharp.png", alt: "Deccan Queen on Rails", width: 1254, height: 1254 %></figure>
 
   <%= tag.span class: "btn btn--reversed btn--faux room--current" do %>
     <h1 class="room__contents txt-medium overflow-ellipsis">
