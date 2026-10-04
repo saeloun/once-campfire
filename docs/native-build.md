@@ -35,14 +35,16 @@ cd campfire-native-release
 
 gh release download campfire-dq-logo-be39e42-4683831-20261004 \
   --repo vipulnsward/roundhouse \
-  --pattern docker.tgz --pattern provenance.json --pattern validation.md
+  --pattern docker.tgz --pattern campfire-linux-amd64 \
+  --pattern provenance.json --pattern validation.md
 
 python3 - <<'PY'
 import hashlib, json
 from pathlib import Path
-expected = json.loads(Path("provenance.json").read_text())["artifacts"]["docker.tgz"]
-assert hashlib.sha256(Path("docker.tgz").read_bytes()).hexdigest() == expected
-print("Archive checksum verified")
+artifacts = json.loads(Path("provenance.json").read_text())["artifacts"]
+for filename in ("docker.tgz", "campfire-linux-amd64"):
+    assert hashlib.sha256(Path(filename).read_bytes()).hexdigest() == artifacts[filename]
+print("Archive and executable checksums verified")
 PY
 
 tar -xzf docker.tgz
@@ -116,12 +118,13 @@ need Docker emulation or an AMD64 builder. The binary requires the runtime
 libraries and files packaged in the image; copying only the executable to an
 arbitrary machine is insufficient.
 
-For an isolated local smoke check, use a new volume and a loopback port:
+For an isolated local smoke check, use an anonymous volume and a loopback port.
+Docker removes the volume when this `--rm` container stops:
 
 ```sh
 docker run --rm -d --name campfire-native-check --platform linux/amd64 \
   -p 127.0.0.1:14300:3000 \
-  -v campfire-native-check-data:/app/storage campfire-native:4683831
+  -v /app/storage campfire-native:4683831
 
 # After the server starts, inspect first-run setup and an embedded asset.
 curl -fsSL http://127.0.0.1:14300/ -o first-run.html
