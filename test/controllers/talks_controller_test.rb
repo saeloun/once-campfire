@@ -14,6 +14,18 @@ class TalksControllerTest < ActionDispatch::IntegrationTest
     ENV["TALK_CHANNELS_ENABLED"] = @previous_flag
   end
 
+  test "talk switcher shows only existing mapped member rooms" do
+    other = TalkSlot.create!(room: rooms(:designers), uid: "talk-switcher@deccanqueenonrails.com", title: "Visible member talk", speaker: "Demo speaker", starts_at: Time.current, ends_at: 1.hour.from_now)
+    private_room = Rooms::Closed.create!(name: "Private synthetic room", creator: users(:jason))
+    hidden = TalkSlot.create!(room: private_room, uid: "talk-hidden-switcher@deccanqueenonrails.com", title: "Hidden nonmember talk", speaker: "Demo speaker", starts_at: Time.current, ends_at: 1.hour.from_now)
+    get room_talk_path(@room)
+    assert_response :success
+    assert_select ".talk-switcher a[href=?]", room_talk_path(@room), count: 1
+    assert_select ".talk-switcher a[aria-current=page]", text: @talk.title
+    assert_select ".talk-switcher a[href=?]", room_talk_path(other.room_id), count: 1
+    assert_select ".talk-switcher a[href=?]", room_talk_path(hidden.room_id), count: 0
+  end
+
   test "default off hides pilot and leaves ask as ordinary chat" do
     ENV.delete("TALK_CHANNELS_ENABLED")
     get room_talk_path(@room)
@@ -213,6 +225,100 @@ class TalksControllerTest < ActionDispatch::IntegrationTest
     TalkSlot.any_instance.expects(:question_body!).raises(RuntimeError, "Db.exec failed (5): database is locked").once
     assert_raises(RuntimeError) { post_message "/ask Already locked", "after-lock" }
     assert_equal 0, @talk.talk_questions.count
+  end
+
+  test "vote and moderation retry only first-lock contention with one committed effect" do
+    post_message "/ask Guarded vote", "guarded-vote"
+    question = @talk.talk_questions.first
+    [ [ room_talk_vote_path(@room), { question_id: question.id } ], [ room_talk_moderate_path(@room), { command: "questions" } ] ].each do |url, values|
+      TalksController.any_instance.expects(:acquire_talk_write_lock).raises(RuntimeError, "Db.exec failed (5): database is locked").then.returns(1).twice
+      post url, params: values
+      assert_response :no_content
+      TalksController.any_instance.unstub(:acquire_talk_write_lock)
+    end
+    assert_equal 1, question.talk_votes.count
+    assert_equal "questions", @talk.reload.mode
+  end
+
+  test "exhausted vote and moderation contention returns 503 without effects" do
+    post_message "/ask Busy vote", "busy-vote"
+    question = @talk.talk_questions.first
+    [ [ room_talk_vote_path(@room), { question_id: question.id } ], [ room_talk_moderate_path(@room), { command: "questions" } ] ].each do |url, values|
+      TalksController.any_instance.expects(:acquire_talk_write_lock).raises(RuntimeError, "Db.exec failed (5): database is locked").times(3)
+      post url, params: values
+      assert_response :service_unavailable
+      assert_equal "1", response.headers["Retry-After"]
+      TalksController.any_instance.unstub(:acquire_talk_write_lock)
+    end
+    assert_equal 0, question.talk_votes.count
+    assert_equal "chat", @talk.reload.mode
+  end
+
+  test "unrelated and post-lock vote moderation errors do not replay" do
+    post_message "/ask No replay", "no-replay"
+    question = @talk.talk_questions.first
+    TalksController.any_instance.expects(:acquire_talk_write_lock).raises(RuntimeError, "unrelated failure").once
+    assert_raises(RuntimeError) { post room_talk_vote_path(@room), params: { question_id: question.id } }
+    TalksController.any_instance.unstub(:acquire_talk_write_lock)
+    TalkQuestion.any_instance.expects(:vote!).raises(RuntimeError, "Db.exec failed (5): database is locked").once
+    assert_raises(RuntimeError) { post room_talk_vote_path(@room), params: { question_id: question.id } }
+    TalkSlot.any_instance.expects(:snapshot).raises(RuntimeError, "Db.exec failed (5): database is locked").once
+    assert_raises(RuntimeError) { post room_talk_moderate_path(@room), params: { command: "advance" } }
+    assert_equal 0, question.talk_votes.count
+    assert_nil @talk.reload.active_question_id
+  end
+
+  test "guarded duplicate votes and stage hides keep one persistent effect" do
+    post_message "/ask Duplicate guarded action", "guarded-duplicate"
+    question = @talk.talk_questions.first
+    2.times do
+      post room_talk_vote_path(@room), params: { question_id: question.id }
+      assert_response :no_content
+      post room_talk_moderate_path(@room), params: { command: "hide_message", message_id: question.message_id }
+      assert_response :no_content
+    end
+    assert_equal 1, question.talk_votes.count
+    assert_equal 1, @talk.talk_hidden_messages.count
+  end
+
+  test "dangling memberships cannot read mutate or post to an absent pilot room" do
+    @room = Rooms::Closed.create!(name: "Absent synthetic pilot", creator: users(:david))
+    @room.memberships.grant_to([ users(:david), users(:jz) ])
+    @talk.update!(room: @room)
+    Room.where(id: @room.id).delete_all
+    assert Membership.exists?(room_id: @room.id, user_id: users(:david).id)
+    assert Membership.exists?(room_id: @room.id, user_id: users(:jz).id)
+    [ :david, :jz ].each do |user|
+      sign_in user
+      [ room_talk_path(@room), room_talk_stage_path(@room), room_talk_snapshot_path(@room) ].each do |url|
+        assert_raises(ActiveRecord::RecordNotFound) { get url }
+      end
+      [ room_talk_vote_path(@room), room_talk_moderate_path(@room) ].each do |url|
+        assert_raises(ActiveRecord::RecordNotFound) { post url, params: { command: "blank", question_id: 0 } }
+      end
+      post_message "/ask Deleted channel", "missing-#{user}"
+      assert_response :not_found
+    end
+    assert_equal 0, Message.where(room_id: @room.id).count
+    assert_equal 0, TalkSlot.where(room_id: @room.id).count
+  end
+
+  test "write guard refreshes the active pin before choosing the next question" do
+    post_message "/ask First pin", "pin-first"
+    post_message "/ask Second pin", "pin-second"
+    first, second = @talk.talk_questions.order(:id).to_a
+    @talk.update!(active_question_id: first.id)
+    controller = TalksController.new
+    controller.instance_variable_set(:@talk, @talk)
+    TalkSlot.find(@talk.id).update!(active_question_id: second.id)
+    completed = controller.send(:with_talk_write) do
+      current = controller.instance_variable_get(:@talk)
+      assert_equal second.id, current.active_question_id
+      next_question = current.snapshot(users(:david))[:questions].find { |entry| !entry[:answered] && entry[:id] != current.active_question_id }
+      current.update!(active_question_id: next_question[:id])
+    end
+    assert completed
+    assert_equal first.id, @talk.reload.active_question_id
   end
 
   private

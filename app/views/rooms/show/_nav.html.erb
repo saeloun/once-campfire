@@ -17,7 +17,7 @@
   <% end %>
 
   <% if TalkSlot.enabled? && !room.direct? && TalkSlot.find_by(room_id: room.id) %>
-    <%= link_to "Talk questions · /ask", room_talk_path(room), target: "_blank", rel: "noopener", class: "btn" %>
+    <%= link_to "Ask a question", room_talk_path(room, anchor: "ask"), target: "_blank", rel: "noopener", class: "btn" %>
   <% end %>
 
   <%= render "rooms/involvements/bell", room: room %>

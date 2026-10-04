@@ -1,6 +1,6 @@
 <% content_for :footer do %>
   <% if TalkSlot.enabled? && !room.direct? && TalkSlot.find_by(room_id: room.id) %>
-    <p class="txt-small">This talk channel may appear on stage. Use /ask to collect a question, including during Q&amp;A. Keep personal details out.</p>
+    <div class="talk-channel-notice"><strong>Live talk channel</strong><%= link_to "Questions →", room_talk_path(room), target: "_blank", rel: "noopener" %><p>Chat may appear on stage. Ask with /ask or open Questions.</p></div>
   <% end %>
   <div class="composer flex align-end gap position-relative"
       data-controller="typing-notifications" data-typing-notifications-active-class="typing-indicator--active">

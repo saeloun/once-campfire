@@ -8,7 +8,7 @@
 }
 
 .deccan-queen {
-  --font-family: "Inter", -apple-system, BlinkMacSystemFont, Aptos, Roboto, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, Aptos, Roboto, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --color-text: hsl(330 10% 17%);
   --hover-color: var(--color-link);
 

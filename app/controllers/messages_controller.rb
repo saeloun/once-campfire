@@ -19,6 +19,10 @@ class MessagesController < ApplicationController
 
   def create
     set_room
+    if TalkSlot.enabled? && @room.nil?
+      head :not_found
+      return
+    end
     talk = TalkSlot.find_by(room_id: @room.id) if TalkSlot.enabled? && Current.user.active? && !Current.user.bot? && !@room.direct?
     if talk
       lock_retries = 0

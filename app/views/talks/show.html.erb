@@ -1,21 +1,47 @@
 <% @page_title = @talk.title %>
 <section class="talk-pilot" data-controller="talk-pilot" data-talk-pilot-snapshot-value="<%= room_talk_snapshot_path(@room) %>" data-talk-pilot-vote-value="<%= room_talk_vote_path(@room) %>" data-talk-pilot-moderate-value="<%= room_talk_moderate_path(@room) %>" data-talk-pilot-moderator-value="<%= Current.user.administrator? %>">
-  <p class="talk-eyebrow">Deccan Queen on Rails · Talk questions</p>
-  <h1><%= @talk.title %></h1>
-  <p><%= @talk.speaker %> · <%= @talk.starts_at.in_time_zone("Asia/Kolkata").strftime("%d %b, %H:%M") %> IST</p>
-  <p>In the <%= link_to "live talk channel", room_path(@room), target: "_blank", rel: "noopener" %>, send <strong>/ask your question</strong>. Questions stay open during Q&amp;A. Channel messages and questions may appear on the conference screen; keep personal details out.</p>
-  <p data-talk-pilot-target="status" role="status">Connecting to the question queue…</p>
-  <% if Current.user.administrator? %>
-    <%= link_to "Open stage pilot", room_talk_stage_path(@room), target: "_blank", rel: "noopener", class: "btn" %>
-    <div class="talk-controls" aria-label="Projection controls">
-      <% { "chat" => "Live chat", "questions" => "Start Q&A", "advance" => "Next question", "paused" => "Pause screen", "blank" => "Blank screen", "live" => "Resume screen" }.each do |command, label| %>
-        <button type="button" data-action="talk-pilot#moderate" data-command="<%= command %>"><%= label %></button>
-      <% end %>
+  <header class="talk-header">
+    <div class="talk-identity">
+      <%= image_tag "deccan-queen/deccan-logo.png", alt: "", width: 32, height: 32 %>
+      <p class="talk-eyebrow">Deccan Queen on Rails<% if ENV["TALK_PILOT_DEMO"] == "true" %> · Demo<% end %></p>
+      <details class="talk-switcher"><summary>All talks</summary>
+        <nav aria-label="Available talks">
+          <% @available_talks.each do |available| %>
+            <a href="<%= room_talk_path(available.room_id) %>"<% if available.id == @talk.id %> aria-current="page"<% end %>><%= available.title %></a>
+          <% end %>
+        </nav>
+      </details>
     </div>
-  <% end %>
+    <h1><%= @talk.title %></h1>
+    <div class="talk-metadata"><p class="talk-speaker"><%= @talk.speaker %></p><p class="talk-time"><%= @talk.starts_at.in_time_zone("Asia/Kolkata").strftime("%H:%M") %> IST</p></div>
+    <div class="talk-header-actions"><span class="talk-mode" data-talk-pilot-target="mode">Connecting</span><a href="#ask" class="talk-ask-link" data-action="talk-pilot#focusAsk">Ask a question ↓</a></div>
+  </header>
+  <nav class="talk-tabs" aria-label="Talk navigation"><%= link_to "Chat", room_path(@room) %><a href="#questions" aria-current="page">Questions <span data-talk-pilot-target="count"></span></a></nav>
+  <p class="talk-status" data-talk-pilot-target="status" role="status">Connecting to the question queue…</p>
   <% if Current.user.administrator? %>
-    <ol class="talk-stage-messages" data-talk-pilot-target="messages" aria-label="Stage chat moderation"></ol>
+    <details class="talk-moderator"><summary>Moderator controls</summary>
+      <div class="talk-control-group"><p>Display mode</p><div class="talk-controls">
+        <button type="button" data-action="talk-pilot#moderate" data-command="chat" aria-pressed="false">Chat</button>
+        <button type="button" data-action="talk-pilot#moderate" data-command="questions" aria-pressed="false">Q&amp;A</button>
+      </div></div>
+      <div class="talk-control-group"><p>Conference screen</p><div class="talk-controls">
+        <button type="button" data-action="talk-pilot#moderate" data-command="paused" aria-pressed="false">Pause</button>
+        <button type="button" data-action="talk-pilot#moderate" data-command="blank" aria-pressed="false">Blank</button>
+        <button type="button" data-action="talk-pilot#moderate" data-command="live" aria-pressed="false">Resume</button>
+      </div></div>
+      <div class="talk-controls"><button type="button" data-action="talk-pilot#moderate" data-command="advance">Next question</button><%= link_to "Open stage", room_talk_stage_path(@room), target: "_blank", rel: "noopener" %></div>
+      <h3>Recent stage chat</h3><ol class="talk-stage-messages" data-talk-pilot-target="messages" aria-label="Stage chat moderation"></ol>
+    </details>
   <% end %>
+  <h2 id="questions" class="for-screen-reader">Questions</h2>
   <ol class="talk-questions" data-talk-pilot-target="questions" aria-label="Talk questions"></ol>
-  <p data-talk-pilot-target="empty" hidden>No questions yet. Start with /ask in the live channel.</p>
+  <div class="talk-empty" data-talk-pilot-target="empty" hidden><h3>Start the conversation</h3><p>Use Ask a question to send yours. Vote for questions you would like answered.</p></div>
+  <form id="ask" class="talk-ask" action="<%= room_messages_path(@room) %>" method="post" data-action="submit->talk-pilot#ask">
+    <label for="talk-question-body">Ask the speaker</label>
+    <p id="talk-ask-help">Questions stay open during Q&amp;A.</p>
+    <textarea id="talk-question-body" name="question" rows="2" maxlength="500" required placeholder="What would you like to know?" aria-describedby="talk-ask-help talk-privacy" data-talk-pilot-target="draft" data-action="input->talk-pilot#saveDraft"></textarea>
+    <button type="submit" data-talk-pilot-target="send">Send question</button>
+    <p class="talk-ask-feedback" data-talk-pilot-target="askFeedback" role="status" hidden></p>
+    <p id="talk-privacy" class="talk-privacy">Chat and questions may appear on stage. Keep personal details out.</p>
+  </form>
 </section>

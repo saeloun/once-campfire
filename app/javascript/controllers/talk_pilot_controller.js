@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["questions", "messages", "status", "empty"]
+  static targets = ["questions", "messages", "status", "empty", "mode", "count", "draft", "send", "askFeedback"]
   static values = { snapshot: String, vote: String, moderate: String, stage: Boolean, moderator: Boolean }
 
   connect() {
     this.connected = true
     this.generation = (this.generation || 0) + 1
+    if (this.hasDraftTarget && location.hash === "#ask") requestAnimationFrame(() => this.draftTarget.focus())
     this.poll()
   }
 
@@ -43,11 +44,16 @@ export default class extends Controller {
     const active = state.active_question_id
     this.activeQuestion = active
     const questions = state.questions.slice().sort((a, b) => Number(b.id === active) - Number(a.id === active) || Number(a.answered) - Number(b.answered) || b.votes - a.votes || a.id - b.id)
-    const visible = this.stageValue ? (state.mode === "questions" ? questions.slice(0, 3) : []) : questions
+    const limit = questions[0]?.id === active && questions[0].body.length > 350 ? 1 : 3
+    const visible = this.stageValue ? (state.mode === "questions" ? questions.slice(0, limit) : []) : questions
     this.renderList(this.questionsTarget, visible, question => this.questionNode(question, active))
-    if (this.hasMessagesTarget) this.renderList(this.messagesTarget, state.messages.slice(-4), message => this.messageNode(message))
-    this.emptyTarget.hidden = visible.length > 0 || state.messages.length > 0 || state.projection !== "live"
-    this.statusTarget.textContent = state.projection === "live" ? (this.thanks || (state.mode === "questions" ? "Q&A is live · /ask stays open" : "Talk chat is live · /ask stays open")) : (state.projection === "paused" ? "Projection paused · questions remain open" : "")
+    if (this.hasMessagesTarget) this.renderList(this.messagesTarget, state.messages.slice(this.stageValue ? -3 : -4), message => this.messageNode(message))
+    if (this.hasModeTarget) this.modeTarget.textContent = state.mode === "questions" ? "Live Q&A" : "Live chat"
+    if (this.hasCountTarget) this.countTarget.textContent = `(${state.pending_total || questions.filter(question => !question.answered).length})`
+    for (const button of this.element.querySelectorAll("[aria-pressed]")) button.setAttribute("aria-pressed", String(button.dataset.command === state.mode || button.dataset.command === state.projection))
+    this.element.dataset.mode = state.mode
+    this.emptyTarget.hidden = visible.length > 0 || (this.stageValue && state.messages.length > 0) || state.projection !== "live"
+    this.statusTarget.textContent = state.projection === "live" ? (this.stageValue ? "" : (this.thanks || "")) : (state.projection === "paused" ? "Projection paused · questions remain open" : "")
     if (!this.stageValue && state.projection === "live" && state.pending_total > 50) this.statusTarget.textContent += ` · ${state.pending_total} waiting; showing the earliest 50`
     this.element.dataset.projection = state.projection
   }
@@ -78,18 +84,26 @@ export default class extends Controller {
     const item = document.createElement("li")
     item.className = "talk-question"
     item.dataset.active = String(question.id === active)
+    item.dataset.answered = String(question.answered)
+    if (this.stageValue && question.id === active) item.dataset.length = question.body.length > 160 ? "long" : question.body.length > 110 ? "medium" : "short"
     const text = document.createElement("p")
     text.textContent = this.stageValue && question.id !== active ? question.body.slice(0, 100) : question.body
     const badge = document.createElement("span")
     badge.className = "talk-badge"
-    badge.textContent = `${question.id === active ? "On the mic · " : ""}${question.answered ? "Answered by speaker · " : ""}${question.votes} votes`
-    item.append(text, badge)
+    badge.textContent = question.answered ? "Answered" : question.id === active ? "Now answering" : (this.stageValue ? "Up next" : "Waiting")
+    const votes = document.createElement("span")
+    votes.className = "talk-votes"
+    votes.textContent = `${question.votes} ${question.votes === 1 ? "vote" : "votes"}`
+    const metadata = document.createElement("div")
+    metadata.className = "talk-question-meta"
+    metadata.append(badge, votes)
+    item.append(metadata, text)
     if (!this.stageValue) {
       const actions = document.createElement("div")
       actions.className = "talk-question-actions"
-      actions.append(this.button(question.voted ? "Thanks — voted" : "Vote", "vote", question.id, question.voted))
+      actions.append(this.button(question.voted ? "↑ Voted" : "↑ Vote", "vote", question.id, question.voted))
       if (this.moderatorValue) {
-        actions.append(this.button("On the mic", "select", question.id), this.button("Answered", "answer", question.id), this.button("Hide", "hide", question.id))
+        actions.append(this.button("Show on stage", "select", question.id), this.button("Answered", "answer", question.id), this.button("Hide", "hide", question.id))
       }
       item.append(actions)
     }
@@ -101,7 +115,10 @@ export default class extends Controller {
     item.className = "talk-stage-message"
     const text = document.createElement("p")
     text.textContent = message.body.slice(0, 180)
-    item.append(text)
+    const label = document.createElement("span")
+    label.className = "talk-badge"
+    label.textContent = message.body.trim().startsWith("/ask ") ? "Question submitted" : "Message"
+    item.append(label, text)
     if (!this.stageValue && this.moderatorValue) {
       const hide = this.button("Hide from stage", "hide_message", "")
       hide.dataset.messageId = message.id
@@ -119,6 +136,59 @@ export default class extends Controller {
     button.dataset.action = command === "vote" ? "talk-pilot#vote" : "talk-pilot#moderate"
     button.disabled = disabled
     return button
+  }
+
+  focusAsk(event) {
+    event.preventDefault()
+    this.draftTarget.scrollIntoView({ block: "center" })
+    this.draftTarget.focus({ preventScroll: true })
+  }
+
+  saveDraft() {
+    if (!this.sending && this.hasAskFeedbackTarget) this.askFeedbackTarget.hidden = true
+    this.askClientId = undefined
+  }
+
+  async ask(event) {
+    event.preventDefault()
+    if (this.sending || !this.draftTarget.value.trim()) return
+    this.sending = true
+    this.sendTarget.disabled = true
+    this.sendTarget.textContent = "Sending…"
+    this.setAskFeedback("Sending your question…")
+    this.askClientId ||= crypto.randomUUID()
+    const question = this.draftTarget.value.trim()
+    const container = document.createElement("div")
+    container.textContent = `/ask ${question}`
+    const body = new URLSearchParams()
+    body.set("message[body]", container.outerHTML)
+    body.set("message[client_message_id]", this.askClientId)
+    try {
+      const response = await fetch(event.currentTarget.action, { method: "POST", credentials: "same-origin", headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content, Accept: "text/vnd.turbo-stream.html" }, body })
+      if (response.status !== 200 || response.redirected || !response.headers.get("content-type")?.includes("text/vnd.turbo-stream.html")) throw new Error("Question failed")
+      await response.text()
+      if (this.draftTarget.value.trim() === question) {
+        this.draftTarget.value = ""
+      }
+      this.askClientId = undefined
+      this.setAskFeedback("Question sent. Vote for the questions you would like answered.")
+      clearTimeout(this.timer)
+      this.abort?.abort()
+      if (this.connected) this.poll()
+    } catch {
+      this.setAskFeedback("Not confirmed — your draft is kept. Try sending again.")
+    } finally {
+      this.sending = false
+      this.sendTarget.disabled = false
+      this.sendTarget.textContent = "Send question"
+    }
+  }
+
+  setAskFeedback(message) {
+    if (this.hasAskFeedbackTarget) {
+      this.askFeedbackTarget.hidden = false
+      this.askFeedbackTarget.textContent = message
+    }
   }
 
   vote(event) {
