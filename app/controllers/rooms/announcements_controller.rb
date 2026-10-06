@@ -8,15 +8,16 @@ class Rooms::AnnouncementsController < RoomsController
 
   def create
     if room = Rooms::Announcement.first
-      room.backfill_memberships
+      Rooms::Announcement.backfill_memberships(room)
     else
       room = Rooms::Announcement.create!(room_params)
     end
     broadcast_prepend_to :rooms, target: :shared_rooms, partial: "users/sidebars/rooms/shared", locals: { room: room }
     redirect_to room_url(room)
   rescue ActiveRecord::RecordNotUnique
-    room = Rooms::Announcement.first!
-    room.backfill_memberships
+    room = Rooms::Announcement.first
+    raise ActiveRecord::RecordNotFound unless room
+    Rooms::Announcement.backfill_memberships(room)
     redirect_to room_url(room)
   end
 
