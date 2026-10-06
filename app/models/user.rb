@@ -53,7 +53,7 @@ class User < ApplicationRecord
   private
     def grant_membership_to_announcements
       return unless active? && !bot?
-      Rooms::Announcement.all.each { |room| room.memberships.grant_to(self) }
+      Rooms::Announcement.all.each { |room| Rooms::Announcement.grant_membership_to(room, self) }
     end
 
     def grant_membership_to_open_rooms

@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 
 class AnnouncementTest < ActiveSupport::TestCase
   setup do
@@ -16,6 +17,73 @@ class AnnouncementTest < ActiveSupport::TestCase
     assert_equal User.active.without_bots.count, @room.memberships.count
     assert_equal "mentions", membership.reload.involvement
     assert_not @room.users.include?(users(:bender))
+  end
+
+  test "backfill accepts an exact concurrent membership without replacing its preferences" do
+    user = users(:jz)
+    @room.memberships.find_by!(user: user).destroy!
+    grant = @room.memberships.method(:grant_to)
+    raced = false
+    competing_grant = lambda do |people|
+      if people == [ user ] && !raced
+        raced = true
+        @room.memberships.create!(user: user, involvement: "mentions")
+        raise ActiveRecord::RecordNotUnique, "synthetic competing membership"
+      else
+        grant.call(people)
+      end
+    end
+
+    @room.memberships.stub(:grant_to, competing_grant) { @room.backfill_memberships }
+
+    assert raced
+    assert_equal 1, @room.memberships.where(user: user).count
+    assert_equal "mentions", @room.memberships.find_by!(user: user).involvement
+    assert_equal User.active.without_bots.count, @room.memberships.count
+  end
+
+  test "membership collisions without the exact room and user are not swallowed" do
+    user = users(:jz)
+    @room.memberships.find_by!(user: user).destroy!
+    assert Membership.exists?(room_id: rooms(:designers).id, user_id: user.id)
+    assert @room.memberships.exists?(user_id: users(:david).id)
+    error = ActiveRecord::RecordNotUnique.new("synthetic unrelated unique failure")
+
+    @room.memberships.stub(:grant_to, ->(_people) { raise error }) do
+      raised = assert_raises(ActiveRecord::RecordNotUnique) do
+        Rooms::Announcement.grant_membership_to(@room, user)
+      end
+      assert_same error, raised
+    end
+
+    assert_not @room.memberships.exists?(user_id: user.id)
+  end
+
+  test "new human signup accepts an exact concurrent announcement membership" do
+    insert = Membership.method(:insert_all)
+    raced = false
+    competing_insert = lambda do |attributes, **options|
+      if attributes.size == 1 && attributes.first[:room_id] == @room.id
+        raced = true
+        Membership.create!(attributes.first.merge(involvement: "mentions"))
+        raise ActiveRecord::RecordNotUnique, "synthetic signup membership collision"
+      else
+        insert.call(attributes, **options)
+      end
+    end
+    person = nil
+
+    Membership.stub(:insert_all, competing_insert) do
+      person = User.create!(name: "Synthetic Concurrent Person", email_address: "concurrent-person@announcement.invalid", password: "synthetic-secret")
+    end
+
+    assert raced
+    assert person.active?
+    assert person.member?
+    assert_equal 1, @room.memberships.where(user: person).count
+    assert_equal "mentions", @room.memberships.find_by!(user: person).involvement
+    assert person.rooms.exists?(id: rooms(:pets).id)
+    assert_not person.rooms.exists?(id: rooms(:watercooler).id)
   end
 
   test "membership backfill handles more than one bounded batch without duplicates" do
