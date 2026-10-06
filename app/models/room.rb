@@ -23,6 +23,7 @@ class Room < ApplicationRecord
   belongs_to :creator, class_name: "User", default: -> { Current.user }
 
   validate :direct_rooms_keep_their_type, on: :update
+  validate :announcement_rooms_keep_their_type, on: :update
 
   scope :opens,           -> { where(type: "Rooms::Open") }
   scope :closeds,         -> { where(type: "Rooms::Closed") }
@@ -62,11 +63,28 @@ class Room < ApplicationRecord
     is_a?(Rooms::Direct)
   end
 
+  def announcement?
+    is_a?(Rooms::Announcement)
+  end
+
+  def postable_by?(user)
+    return true unless announcement?
+    return false unless user
+    writer = User.find_by(id: user.id)
+    writer && writer.active? && writer.administrator? && writer.memberships.exists?(room_id: id)
+  end
+
   def default_involvement
     "mentions"
   end
 
   private
+    def announcement_rooms_keep_their_type
+      if type_changed? && (type_was == "Rooms::Announcement" || type == "Rooms::Announcement")
+        errors.add :type, "can't be changed to or from an announcements room"
+      end
+    end
+
     # Open and closed rooms convert into each other freely. A direct room can't become
     # either: its participants agreed to a private conversation, not to one whose
     # audience someone else gets to widen afterwards.

@@ -1,7 +1,8 @@
 <%# Be sure to check/update messages/_template.html.erb when changing this file %>
 
 <%# Bump this version when the message presentation filters change what they emit. Editing this line changes the template digest, which busts BOTH this fragment cache and the collection cache that keys on this partial's digest (helper Ruby changes alone don't). %>
-<% cache [ message, "presentation-v3" ] do %>
+<% cache [ message, "presentation-v4" ] do %>
+  <% room = message.room %>
   <%= message_tag message do %>
     <h2 class="message__day-separator"><%= local_datetime_tag message.created_at, style: :date %></h2>
 
@@ -17,16 +18,16 @@
               <span class="message__author" title="<%= message.creator.title %>">
                 <strong data-reply-target="author"><%= message.creator.name %></strong>
               </span>
-              <%= link_to message_timestamp(message, class: "message__timestamp"), room_at_message_path(message.room, message), target: "_top",
+              <%= link_to message_timestamp(message, class: "message__timestamp"), room_at_message_path(room, message), target: "_top",
                     class: "message__permalink" %>
               <span class="message__room">
-                <%= link_to room_display_name(message.room, for_user: nil), room_at_message_path(message.room, message), target: "_top", data: { reply_target: "link" } %>
+                <%= link_to room_display_name(room, for_user: nil), room_at_message_path(room, message), target: "_top", data: { reply_target: "link" } %>
               </span>
             </h3>
-            <%= render "messages/actions", message: message, url: room_at_message_url(message.room, message) %>
+            <%= render "messages/actions", message: message, room: room, url: room_at_message_url(room, message) %>
           </div>
           <%= render "messages/presentation", message: message %>
-          <%= render "messages/boosts/boosts", message: message %>
+          <%= render "messages/boosts/boosts", message: message unless room.announcement? %>
         </div>
       </div>
     </turbo-frame>

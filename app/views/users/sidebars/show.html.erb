@@ -45,6 +45,9 @@
           <%= image_tag "add.svg", size: 20, aria: { hidden: "true" }, style: "view-transition-name: new-room" %>
         <% end %>
       <% end %>
+      <% if Current.user.active? && Current.user.administrator? %>
+        <%= link_to "Announcements settings", new_rooms_announcement_path, class: "btn" %>
+      <% end %>
     </div>
 
     <button class="btn sidebar__toggle" data-action="toggle-class#toggle">

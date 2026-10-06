@@ -8,6 +8,7 @@ class RoomsController < ApplicationController
   end
 
   def show
+    @announcement_publisher = @room.announcement? && @room.postable_by?(Current.user)
     @messages = find_messages
   end
 
@@ -34,7 +35,8 @@ class RoomsController < ApplicationController
     end
 
     def ensure_can_administer
-      head :forbidden unless Current.user.can_administer?(@room)
+      allowed = @room.announcement? ? @room.postable_by?(Current.user) : Current.user.can_administer?(@room)
+      head :forbidden unless allowed
     end
 
     def ensure_permission_to_create_rooms

@@ -1,0 +1,6 @@
+<% @page_title = "Announcements settings" %>
+<section class="panel">
+  <h1>Announcements settings</h1>
+  <%= render "rooms/announcements/form", room: @room %>
+  <%= link_to "Open Announcements", room_path(@room) %>
+</section>

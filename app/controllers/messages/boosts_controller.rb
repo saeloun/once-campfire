@@ -1,5 +1,6 @@
 class Messages::BoostsController < ApplicationController
   before_action :set_message
+  before_action :ensure_reactions_allowed
   before_action :set_boost, only: :destroy
 
   def index
@@ -24,6 +25,10 @@ class Messages::BoostsController < ApplicationController
   private
     def set_message
       @message = Current.user.reachable_messages.find(params[:message_id])
+    end
+
+    def ensure_reactions_allowed
+      head :forbidden if @message.room.announcement?
     end
 
     def set_boost
