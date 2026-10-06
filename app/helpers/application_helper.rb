@@ -19,7 +19,7 @@ module ApplicationHelper
   end
 
   def body_classes
-    [ @body_class, admin_body_class, account_logo_body_class ].compact.join(" ")
+    [ @body_class, admin_body_class, account_logo_body_class, ("announcement-publisher" if @announcement_publisher) ].compact.join(" ")
   end
 
   def link_back

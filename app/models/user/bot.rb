@@ -49,7 +49,7 @@ module User::Bot
   end
 
   def deliver_webhook_later(message)
-    Bot::WebhookJob.perform_later(self, message) if webhook
+    Bot::WebhookJob.perform_later(self, message) if webhook && !message.room.announcement?
   end
 
   def deliver_webhook(message)

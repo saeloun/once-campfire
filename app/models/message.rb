@@ -8,6 +8,8 @@ class Message < ApplicationRecord
 
   has_rich_text :body
 
+  validate :announcement_writer_allowed
+
   before_create -> { self.client_message_id ||= Random.uuid } # Bots don't care
   after_create_commit -> { room.receive(self) }
 
@@ -41,4 +43,12 @@ class Message < ApplicationRecord
       Sound.find_by_name match[:name]
     end
   end
+  private
+    def announcement_writer_allowed
+      return unless room&.announcement?
+      writer = Current.user || creator
+      allowed = room.postable_by?(writer)
+      allowed &&= room.postable_by?(creator) if new_record? && writer&.id != creator_id
+      errors.add :room, "only active administrators with membership can publish announcements" unless allowed
+    end
 end

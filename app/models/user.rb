@@ -20,6 +20,7 @@ class User < ApplicationRecord
   has_secure_password validations: false
 
   after_create_commit :grant_membership_to_open_rooms
+  after_create_commit :grant_membership_to_announcements
 
   scope :ordered, -> { order("LOWER(name)") }
   scope :filtered_by, ->(query) { where("name like ?", "%#{query}%") }
@@ -50,6 +51,11 @@ class User < ApplicationRecord
   end
 
   private
+    def grant_membership_to_announcements
+      return unless active? && !bot?
+      Rooms::Announcement.all.each { |room| room.memberships.grant_to(self) }
+    end
+
     def grant_membership_to_open_rooms
       Membership.insert_all(Rooms::Open.pluck(:id).collect { |room_id| { room_id: room_id, user_id: id } })
     end

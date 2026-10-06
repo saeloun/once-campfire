@@ -45,7 +45,7 @@ class Rooms::ClosedsController < RoomsController
     # Open and closed rooms convert into each other, so both are in reach here. Direct
     # rooms never are: converting one would let its creator revise who's in it.
     def room_scope
-      Current.user.rooms.without_directs
+      Current.user.rooms.where(type: [ "Rooms::Open", "Rooms::Closed" ])
     end
 
     def grantees

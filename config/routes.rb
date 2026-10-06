@@ -87,6 +87,7 @@ Rails.application.routes.draw do
   namespace :rooms do
     resources :opens
     resources :closeds
+    resources :announcements, only: %i[ new create edit update ]
     resources :directs
   end
 

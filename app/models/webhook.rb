@@ -7,6 +7,7 @@ class Webhook < ApplicationRecord
   belongs_to :user
 
   def deliver(message)
+    return if message.room.announcement?
     post(payload(message)).tap do |response|
       if text = extract_text_from(response)
         receive_text_reply_to(message.room, text: text)
@@ -59,6 +60,7 @@ class Webhook < ApplicationRecord
     end
 
     def receive_text_reply_to(room, text:)
+      return if room.announcement?
       room.messages.create!(body: text, creator: user).broadcast_create
     end
 
@@ -70,6 +72,7 @@ class Webhook < ApplicationRecord
     end
 
     def receive_attachment_reply_to(room, attachment:)
+      return if room.announcement?
       room.messages.create_with_attachment!(attachment: attachment, creator: user).broadcast_create
     end
 

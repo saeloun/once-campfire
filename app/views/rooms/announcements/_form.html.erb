@@ -1,0 +1,6 @@
+<%= form_with model: room do |form| %>
+  <label for="room_name">Announcements channel name</label>
+  <%= form.text_field :name, name: "room[name]", id: "room_name", class: "input full-width", required: true %>
+  <p>All active people join automatically. Existing administrators can publish; replies, reactions, and bot posts are disabled.</p>
+  <%= submit_room_button_tag %>
+<% end %>

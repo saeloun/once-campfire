@@ -2,6 +2,7 @@ class MessagesController < ApplicationController
   include ActiveStorage::SetCurrent, RoomScoped
 
   before_action :set_room, except: :create
+  before_action :ensure_room_postable, only: %i[ create edit update destroy ]
   before_action :set_message, only: %i[ show edit update destroy ]
   before_action :ensure_can_administer, only: %i[ edit update destroy ]
 
@@ -18,7 +19,6 @@ class MessagesController < ApplicationController
   end
 
   def create
-    set_room
     @message = @room.messages.create_with_attachment!(message_params)
 
     @message.broadcast_create
@@ -50,6 +50,20 @@ class MessagesController < ApplicationController
   end
 
   private
+    def ensure_room_postable
+      set_room unless @room
+      return false if performed?
+      unless @room && @room.postable_by?(Current.user)
+        head :forbidden
+        return false
+      end
+      true
+    rescue ActiveRecord::RecordNotFound
+      raise unless action_name == "create"
+      render action: :room_not_found
+      false
+    end
+
     def set_message
       @message = @room.messages.find(params[:id])
     end
@@ -77,6 +91,7 @@ class MessagesController < ApplicationController
 
 
     def deliver_webhooks_to_bots
+      return if @room.announcement?
       bots_eligible_for_webhook.excluding(@message.creator).each { |bot| bot.deliver_webhook_later(@message) }
     end
 

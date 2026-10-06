@@ -1,0 +1,10 @@
+<% @page_title = "Announcements settings" %>
+<section class="panel">
+  <h1>Announcements</h1>
+  <% if @room.persisted? %>
+    <%= link_to "Edit channel settings", edit_rooms_announcement_path(@room) %>
+    <%= link_to "Open Announcements", room_path(@room) %>
+  <% else %>
+    <%= render "rooms/announcements/form", room: @room %>
+  <% end %>
+</section>

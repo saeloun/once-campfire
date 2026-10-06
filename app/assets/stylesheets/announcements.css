@@ -1,0 +1,7 @@
+body .message__edit-btn.announcement__edit-btn {
+  display: none;
+}
+
+body.announcement-publisher .message__edit-btn.announcement__edit-btn {
+  display: inline-flex;
+}

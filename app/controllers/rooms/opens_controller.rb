@@ -43,7 +43,7 @@ class Rooms::OpensController < RoomsController
     # Open and closed rooms convert into each other, so both are in reach here. Direct
     # rooms never are: promoting one would republish its history to the whole account.
     def room_scope
-      Current.user.rooms.without_directs
+      Current.user.rooms.where(type: [ "Rooms::Open", "Rooms::Closed" ])
     end
 
     def broadcast_create_room(room)
